@@ -11,7 +11,15 @@ params = {
     botname : "<<the name of the ripple bot>>",                     # The name of the ripple bot
     password : "<<the password to the ripple bot's account>>",      # The password to the ripple bot's account
     orgname : "ripple",                                             # The name of ripple's github organization
-    cibotname : "mtrippled"                                         # The name of the ripple CI bot
+    cibotname : "mtrippled",                                         # The name of the ripple CI bot
+    hookname : "ripple-git-bot",                                     # The name of the hook into this file
+    hookurl : "<<the url of this file>>",                            # The url of this file for hooking into
+    hookevents : [                                                      # The different events the hook is triggered on
+                 "commit_comment",
+                 "issue_comment",
+                 "pull_request",
+                 "member"
+                 ]
     }
 
 # Middleware Functions:
@@ -50,6 +58,16 @@ def status(pull, authname):
     else:
         return False
 
+def hookbot(repo, hookname, hookurl, hookevents):
+    """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
+    config = {
+        "url":hookurl          # The config for the hook
+        }
+    for hook in repo.get_hooks():               # Checks each hook to see if it is a hook for the bot
+        if hook.name == hookname:               # If the hook already exists, exit the function
+            hook.edit(hookname, config, events=hookevents, active=True)             # Updates the hook for the bot
+    repo.create_hook(hookname, config, events=hookevents, active=True)              # Creates a hook for the bot
+
 # Utility Functions:
 
 def formatting(inputstring):
@@ -76,10 +94,11 @@ org = client.get_organization(params["orgname"])                    # Accesses r
 # Creating The Necessary Objects:
 
 openpulls = {}
-for repo in org.get_repos():                           # Loops through each repo in ripple's github
+for repo in org.get_repos():                                                        # Loops through each repo in ripple's github
+    hookbot(repo, params["hookname"], params["hookurl"], params["hookevents"])    # Makes sure the bot is hooked into the repository
     openpulls[repo] = []
-    for pull in repo.get_pulls():                       # Loops through each pull request in each repo
-        if not pull.is_merged() and pull.mergeable:     # Checks whether the pull request is still open and automatically mergeable
+    for pull in repo.get_pulls():                                                     # Loops through each pull request in each repo
+        if not pull.is_merged() and pull.mergeable:                                 # Checks whether the pull request is still open and automatically mergeable
             openpulls[repo].append(pull)
 
 members = org.get_members()                          # Gets a list of members
