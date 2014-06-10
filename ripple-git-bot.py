@@ -9,12 +9,12 @@ import string
 # Initialization Parameters:
 
 params = {
-    "botname" : "<<the name of the ripple bot>>",                     # The name of the ripple bot
-    "password" : "<<the password to the ripple bot's account>>",      # The password to the ripple bot's account
+    "botname" : "<<ripplebot>>",                                            # The name of the ripple bot
+    "password" : "<<botpassword>>",                                       # The password to the ripple bot's account
     "orgname" : "ripple",                                             # The name of ripple's github organization
     "cibotname" : "mtrippled",                                         # The name of the ripple CI bot
     "hookname" : "ripple-git-bot",                                     # The name of the hook into this file
-    "hookurl" : "<<the url of this file>>",                            # The url of this file for hooking into
+    "hookurl" : "https://raw.githubusercontent.com/evhub/ripple-git-bot/master/ripple-git-bot.py",  # The url of this file for hooking into
     "hookevents" : [                                                      # The different events the hook is triggered on
                  "commit_comment",
                  "issue_comment",
