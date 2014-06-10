@@ -26,28 +26,6 @@ params = {
 
 # Middleware Functions:
 
-def check(commentlist, memberlist, infodict):
-    """Checks That At Least Two Members Have Commented LGTM And None Commented VETO."""
-    printdebug(params, "            Checking comments...")
-    votes = {}
-    if infodict["creator"] in memberlist:
-        votes[infodict["creator"]] = 1          # If the creator is a member, give them a vote
-        printdebug(params, "                Got LGTM vote from "+infodict["creator"]+".")
-    for user, comment in commentlist:
-        if user in memberlist:
-            if comment == "lgtm":               # If a member commented LGTM, give them a vote
-                votes[user] = 1
-                printdebug(params, "                Got LGTM vote from "+user+".")
-            elif comment == "veto":             # If a member commented VETO, give them a veto
-                votes[user] = float("-inf")
-                printdebug(params, "                Got VETO vote from "+user+".")
-    if sum(votes.values()) >= 2:
-        printdebug(params, "            Found no VETO votes, at least two LGTM votes.")
-        return "Merged by "+infodict["botname"]+". "+infodict["status"]+". Verified looks good to "+", ".join(votes.keys())+"."
-    else:
-        printdebug(params, "            Found less than two LGTM votes, or a VETO vote.")
-        return False
-
 def status(pull, params):
     """Returns Basic Information For The Comments On The Pull In A List."""
     printdebug(params, "            Checking status...")
@@ -72,6 +50,28 @@ def status(pull, params):
         return "Verified passes tests by "+params["cibotname"]+"."             # This string will be passed to check in infodict as infodict["status"]
     else:
         printdebug(params, "            Status is failure.")
+        return False
+
+def check(commentlist, memberlist, infodict):
+    """Checks That At Least Two Members Have Commented LGTM And None Commented VETO."""
+    printdebug(params, "            Checking comments...")
+    votes = {}
+    if infodict["creator"] in memberlist:
+        votes[infodict["creator"]] = 1          # If the creator is a member, give them a vote
+        printdebug(params, "                Got LGTM vote from "+infodict["creator"]+".")
+    for user, comment in commentlist:
+        if user in memberlist:
+            if comment == "lgtm":               # If a member commented LGTM, give them a vote
+                votes[user] = 1
+                printdebug(params, "                Got LGTM vote from "+user+".")
+            elif comment == "veto":             # If a member commented VETO, give them a veto
+                votes[user] = float("-inf")
+                printdebug(params, "                Got VETO vote from "+user+".")
+    if sum(votes.values()) >= 2:
+        printdebug(params, "            Found no VETO votes, at least two LGTM votes.")
+        return "Merged by "+infodict["botname"]+". "+infodict["status"]+". Verified looks good to "+", ".join(votes.keys())+"."
+    else:
+        printdebug(params, "            Found less than two LGTM votes, or a VETO vote.")
         return False
 
 # Utility Functions:
