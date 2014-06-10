@@ -74,20 +74,6 @@ def status(pull, params):
         printdebug(params, "            Status is failure.")
         return False
 
-def hookbot(repo, params):
-    """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
-    printdebug(params, "        Scanning hooks...")
-    config = {
-        "url":params["hookurl"]         # The config for the hook
-        }
-    for hook in repo.get_hooks():                                     # Checks each hook to see if it is a hook for the bot
-        printdebug(params, "            Found hook "+formatting(hook.name)+".")
-        if formatting(hook.name) == params["hookname"]:               # If the hook already exists, exit the function
-            printdebug(params, "                Updating hook...")
-            hook.edit(params["hookname"], config, events=params["hookevents"], active=True)             # Updates the hook for the bot
-    printdebug(params, "        Creating new hook "+params["hookname"]+"...")
-    repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)              # Creates a hook for the bot
-
 # Utility Functions:
 
 def formatting(inputstring):
@@ -110,6 +96,20 @@ def printdebug(params, message):
     """Prints A Message If The Debug Variable Is Set To True."""
     if params["debug"]:
         print(message)
+
+def hookbot(repo, params):
+    """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
+    printdebug(params, "        Scanning hooks...")
+    config = {
+        "url":params["hookurl"]         # The config for the hook
+        }
+    for hook in repo.get_hooks():                                     # Checks each hook to see if it is a hook for the bot
+        printdebug(params, "            Found hook "+formatting(hook.name)+".")
+        if formatting(hook.name) == params["hookname"]:               # If the hook already exists, exit the function
+            printdebug(params, "                Updating hook...")
+            hook.edit(params["hookname"], config, events=params["hookevents"], active=True)             # Updates the hook for the bot
+    printdebug(params, "        Creating new hook "+params["hookname"]+"...")
+    repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)              # Creates a hook for the bot
 
 # Connecting To Github:
 
