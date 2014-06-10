@@ -9,19 +9,19 @@ import string
 # Initialization Parameters:
 
 params = {
-    "botname" : "<<ripplebot>>",                                            # The name of the ripple bot
+    "botname" : "<<botname>>",                                            # The name of the ripple bot
     "password" : "<<botpassword>>",                                       # The password to the ripple bot's account
-    "orgname" : "ripple",                                             # The name of ripple's github organization
+    "orgname" : "ripple-git-test",                                             # The name of ripple's github organization
     "cibotname" : "mtrippled",                                         # The name of the ripple CI bot
     "hookname" : "ripple-git-bot",                                     # The name of the hook into this file
-    "hookurl" : "https://raw.githubusercontent.com/evhub/ripple-git-bot/master/ripple-git-bot.py",  # The url of this file for hooking into
+    "hookurl" : "<<hookurl>>",                                               # The url of this file for hooking into
     "hookevents" : [                                                      # The different events the hook is triggered on
                  "commit_comment",
                  "issue_comment",
                  "pull_request",
                  "member"
                  ],
-    "debug" : False                                                 # Turns on and off the debug output
+    "debug" : True                                                 # Turns on and off the debug output
     }
 
 # Middleware Functions:
@@ -42,16 +42,18 @@ def check(commentlist, memberlist, infodict):
                 votes[user] = float("-inf")
                 printdebug(params, "                Got VETO vote from "+user+".")
     if sum(votes.values()) >= 2:
-        printdebug(params, "            Found no veto votes, at least two LGTM votes.")
+        printdebug(params, "            Found no VETO votes, at least two LGTM votes.")
         return "Merged by "+infodict["botname"]+". "+infodict["status"]+". Verified looks good to "+", ".join(votes.keys())+"."
-    return False
+    else:
+        printdebug(params, "            Found less than two LGTM votes, or a VETO vote.")
+        return False
 
 def status(pull, params):
     """Returns Basic Information For The Comments On The Pull In A List."""
     printdebug(params, "            Checking status...")
     checked = False
     for commit in pull.get_commits():                                         # Loops through each commit
-        printdebug(params, "                Found commit "+formatting(commit.name)+".")
+        printdebug(params, "                Found commit.")
         checked = False
         for status in commit.get_statuses():                                  # Loops through each status on the commit
             if formatting(status.creator.login) == params["cibotname"]:       # Checks if the status was made by the CI bot
@@ -83,10 +85,8 @@ def hookbot(repo, params):
         if formatting(hook.name) == params["hookname"]:               # If the hook already exists, exit the function
             printdebug(params, "                Updating hook...")
             hook.edit(params["hookname"], config, events=params["hookevents"], active=True)             # Updates the hook for the bot
-            printdebug(params, "                Hook updated.")
     printdebug(params, "        Creating new hook "+params["hookname"]+"...")
     repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)              # Creates a hook for the bot
-    printdebug(params, "        New hook created.")
 
 # Utility Functions:
 
@@ -115,18 +115,16 @@ def printdebug(params, message):
 
 printdebug(params, "Connecting to GitHub under login "+params["botname"]+"...")
 client = github.Github(params["botname"], params["password"])       # Logs into the bot's account
-printdebug(params, "Connected to GitHub.")
 
 printdebug(params, "Connecting to organization "+params["orgname"]+"...")
 org = client.get_organization(params["orgname"])                    # Accesses ripple's github organization
-printdebug(params, "Connected to organization.")
 
 # Creating The Necessary Objects:
 
 printdebug(params, "Scanning repositories...")
 openpulls = {}
 for repo in org.get_repos():                                # Loops through each repo in ripple's github
-    printdebug(params, "    Scanning repository name "+formatting(repo.name)+"...")
+    printdebug(params, "    Scanning repository "+formatting(repo.name)+"...")
     hookbot(repo, params)                                  # Makes sure the bot is hooked into the repository
     openpulls[repo] = []
     for pull in repo.get_pulls():                           # Loops through each pull request in each repo
@@ -139,7 +137,7 @@ printdebug(params, "Scanning members...")
 members = org.get_members()                          # Gets a list of members
 memberlist = []
 for member in members:
-    printdebug("    Found member "+formatting(member.login)+".")
+    printdebug(params, "    Found member "+formatting(member.login)+".")
     memberlist.append(formatting(member.login))     # Makes a list of member names
 
 # Running The Middleware On The Objects:
@@ -147,26 +145,25 @@ for member in members:
 printdebug(params, "Running objects...")
 for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
     printdebug(params, "    Entering repo "+formatting(repo.name)+"...")
-    for pulls in openpulls[repo]:
-        for pull in pulls:
-            printdebug(params, "        Found pull request.")
-            result = status(pull, params)      # Calls the status middleware function
-            if result:                                      # If the status middleware function gives the okay, proceed
-                infodict = {                                # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
-                    "creator":formatting(pull.user.login),
-                    "repo":repo,
-                    "pulls":pulls,
-                    "pull":pull,
-                    "openpulls":openpulls,
-                    "client":client,
-                    "org":org,
-                    "members":members,
-                    "status":result
-                    }
-                infodict.update(params)                     # Includes the original initialization parameters in that
-                message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
-                if message:                                 # If the middleware function gives the okay,
-                    printdebug("        Merging pull request with comment "+message+"...")
-                    pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
-                    pull.merge(message)                     # Merge using the middleware function's result as the description
-                    printdebug("        Pull request merged.")
+    for pull in openpulls[repo]:
+        printdebug(params, "        Found pull request.")
+        result = status(pull, params)      # Calls the status middleware function
+        if result:                                      # If the status middleware function gives the okay, proceed
+            infodict = {                                # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                "creator":formatting(pull.user.login),
+                "repo":repo,
+                "pull":pull,
+                "pulls":openpulls,
+                "client":client,
+                "org":org,
+                "members":members,
+                "status":result
+                }
+            infodict.update(params)                     # Includes the original initialization parameters in that
+            message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
+            if message:                                 # If the middleware function gives the okay,
+                printdebug(params, "        Merging pull request with comment "+message+"...")
+                pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
+                pull.merge(message)                     # Merge using the middleware function's result as the description
+                printdebug(params, "        Pull request merged.")
+printdebug(params, "Finished.")
