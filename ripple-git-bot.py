@@ -8,18 +8,19 @@ import string
 # Initialization Parameters:
 
 params = {
-    botname : "<<the name of the ripple bot>>",                     # The name of the ripple bot
-    password : "<<the password to the ripple bot's account>>",      # The password to the ripple bot's account
-    orgname : "ripple",                                             # The name of ripple's github organization
-    cibotname : "mtrippled",                                         # The name of the ripple CI bot
-    hookname : "ripple-git-bot",                                     # The name of the hook into this file
-    hookurl : "<<the url of this file>>",                            # The url of this file for hooking into
-    hookevents : [                                                      # The different events the hook is triggered on
+    "botname" : "<<the name of the ripple bot>>",                     # The name of the ripple bot
+    "password" : "<<the password to the ripple bot's account>>",      # The password to the ripple bot's account
+    "orgname" : "ripple",                                             # The name of ripple's github organization
+    "cibotname" : "mtrippled",                                         # The name of the ripple CI bot
+    "hookname" : "ripple-git-bot",                                     # The name of the hook into this file
+    "hookurl" : "<<the url of this file>>",                            # The url of this file for hooking into
+    "hookevents" : [                                                      # The different events the hook is triggered on
                  "commit_comment",
                  "issue_comment",
                  "pull_request",
                  "member"
-                 ]
+                 ],
+    "debug" : False                                                 # Turns on and off the debug output
     }
 
 # Middleware Functions:
@@ -39,34 +40,34 @@ def check(commentlist, memberlist, infodict):
         return "Merged by "+infodict["botname"]+". "+infodict["status"]+". Verified looks good to "+", ".join(votes.keys())+"."
     return False
 
-def status(pull, authname):
+def status(pull, params):
     """Returns Basic Information For The Comments On The Pull In A List."""
     checked = False
-    for commit in pull.get_commits():                               # Loops through each commit
+    for commit in pull.get_commits():                                         # Loops through each commit
         checked = False
-        for status in commit.get_statuses():                        # Loops through each status on the commit
-            if formatting(status.creator.login) == cibotname:       # Checks if the status was made by the CI bot
-                if formatting(status.state) == "success":           # Checks if the status from the most recent comment by the CI bot is success
+        for status in commit.get_statuses():                                  # Loops through each status on the commit
+            if formatting(status.creator.login) == params["cibotname"]:       # Checks if the status was made by the CI bot
+                if formatting(status.state) == "success":                     # Checks if the status from the most recent comment by the CI bot is success
                     checked = True
                     break
                 else:
-                    return False                                    # We only care about the most recent status from the CI bot, so if that isn't success, then end
+                    return False                                               # We only care about the most recent status from the CI bot, so if that isn't success, then end
         if not checked:
             return False
     if checked:
-        return "Verified passes tests by "+authname+"."             # This string will be passed to check in infodict as infodict["status"]
+        return "Verified passes tests by "+params["cibotname"]+"."             # This string will be passed to check in infodict as infodict["status"]
     else:
         return False
 
-def hookbot(repo, hookname, hookurl, hookevents):
+def hookbot(repo, params):
     """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
     config = {
-        "url":hookurl          # The config for the hook
+        "url":params["hookurl"]                          # The config for the hook
         }
-    for hook in repo.get_hooks():               # Checks each hook to see if it is a hook for the bot
-        if hook.name == hookname:               # If the hook already exists, exit the function
-            hook.edit(hookname, config, events=hookevents, active=True)             # Updates the hook for the bot
-    repo.create_hook(hookname, config, events=hookevents, active=True)              # Creates a hook for the bot
+    for hook in repo.get_hooks():                       # Checks each hook to see if it is a hook for the bot
+        if hook.name == params["hookname"]:               # If the hook already exists, exit the function
+            hook.edit(params["hookname"], config, events=params["hookevents"], active=True)             # Updates the hook for the bot
+    repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)              # Creates a hook for the bot
 
 # Utility Functions:
 
@@ -94,11 +95,11 @@ org = client.get_organization(params["orgname"])                    # Accesses r
 # Creating The Necessary Objects:
 
 openpulls = {}
-for repo in org.get_repos():                                                        # Loops through each repo in ripple's github
-    hookbot(repo, params["hookname"], params["hookurl"], params["hookevents"])    # Makes sure the bot is hooked into the repository
+for repo in org.get_repos():                                # Loops through each repo in ripple's github
+    hookbot(repo, params)                                  # Makes sure the bot is hooked into the repository
     openpulls[repo] = []
-    for pull in repo.get_pulls():                                                     # Loops through each pull request in each repo
-        if not pull.is_merged() and pull.mergeable:                                 # Checks whether the pull request is still open and automatically mergeable
+    for pull in repo.get_pulls():                           # Loops through each pull request in each repo
+        if not pull.is_merged() and pull.mergeable:         # Checks whether the pull request is still open and automatically mergeable
             openpulls[repo].append(pull)
 
 members = org.get_members()                          # Gets a list of members
@@ -111,7 +112,7 @@ for member in members:
 for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
     for pulls in openpulls[repo]:
         for pull in pulls:
-            result = status(pull, params["cibotname"])      # Calls the status middleware function
+            result = status(pull, params)      # Calls the status middleware function
             if result:                                      # If the status middleware function gives the okay, proceed
                 infodict = {                                # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
                     "creator":formatting(pull.user.login),
