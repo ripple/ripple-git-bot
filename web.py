@@ -12,6 +12,7 @@ app = Flask(__name__)
 @app.route("/")
 def web(*args, **kwargs):
     print("Initializing...")
-    out = main(*args, **kwargs)
+    print(args, kwargs)
+    main(*args, **kwargs)
     print("Complete.")
-    return out
+    return "GitHub pull requests succesfully analyzed."
