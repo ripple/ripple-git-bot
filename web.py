@@ -32,3 +32,4 @@ def run():
         printdebug(params, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))      # Displays a message with the output parameters
         working = False
         return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."                      # Returns a summary string for website visitors
+    return "Failed to boot up pull request analyzer. Check logs for more information."
