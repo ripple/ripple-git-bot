@@ -14,7 +14,7 @@ params = {
     "password" : "ripplepass",                                      # The password to the ripple bot's account
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
     "cibotname" : "mtrippled",                                      # The name of the ripple CI bot
-    "hookurl" : "",                                                 # The url of this file for hooking into
+    "hookurl" : "",                                                 # The url of the server file for hooking into
     "hookname" : "ripple-git-bot",                                  # The name of the hook into this file
     "hookevents" : [                                                # The different events the hook is triggered on
                  "commit_comment",
@@ -23,29 +23,29 @@ params = {
                  "member"
                  ],
     "votecount" : 2,                                                # The number of LGTM votes required to merge
-    "debug" : True                                                 # Turns on and off the debug output
+    "debug" : True                                                  # Turns on and off the debug output
     }
 
 # Middleware Functions:
 
 def status(pull, params):
-    """Returns Basic Information For The Comments On The Pull In A List."""
+    """Checks Whether Or Not pull Has Been Signed Off On By The CI Build Manager."""
     printdebug(params, "            Checking status...")
     checked = False
     commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
     printdebug(params, "            Found commit.")
     checked = False
-    for status in commit.get_statuses():                                  # Loops through each status on the commit
+    for status in commit.get_statuses():                                # Loops through each status on the commit
         name = formatting(status.creator.login)
         printdebug(params, "                Found status from bot "+name+".")
-        if name == params["cibotname"]:                                   # Checks if the status was made by the CI bot
-            if formatting(status.state) == "success":                     # Checks if the status from the most recent comment by the CI bot is success
+        if name == params["cibotname"]:                                 # Checks if the status was made by the CI bot
+            if formatting(status.state) == "success":                   # Checks if the status from the most recent comment by the CI bot is success
                 checked = True
                 printdebug(params, "                    CI bot reports commit passed tests.")
                 break
             else:
                 printdebug(params, "                    CI bot reports commit failed tests.")
-                return False                                               # We only care about the most recent status from the CI bot, so if that isn't success, then end
+                return False                                            # We only care about the most recent status from the CI bot, so if that isn't success, then end
     if not checked:
         printdebug(params, "                CI bot not reporting for this commit.")
         return False
@@ -85,7 +85,7 @@ def formatting(inputstring):
     """Insures All Strings Follow A Uniform Format For Ease Of Comparison."""
     out = ""
     for c in inputstring:
-        if c in string.printable:        # Strips out all non-ascii characters
+        if c in string.printable:       # Strips out all non-ascii characters
             out += c
     return str(out).strip().lower()     # Strips initial and trailing whitespace, and makes the whole thing lowercase
 
@@ -167,7 +167,7 @@ def main(params):
     # Creating The Necessary Objects:
 
     printdebug(params, "Scanning members...")
-    members = org.get_members()                                  # Gets a list of members
+    members = org.get_members()                                 # Gets a list of members
     memberlist = []
     for member in members:
         name = formatting(member.login)
@@ -178,7 +178,7 @@ def main(params):
     openpulls = {}
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
         printdebug(params, "    Scanning repository "+formatting(repo.name)+"...")
-        hookbot(repo, params)                                  # Makes sure the bot is hooked into the repository
+        hookbot(repo, params)                                   # Makes sure the bot is hooked into the repository
         openpulls[repo] = []
         for pull in repo.get_pulls():                           # Loops through each pull request in each repo
             printdebug(params, "        Found pull request.")
@@ -193,23 +193,23 @@ def main(params):
         printdebug(params, "    Entering repo "+formatting(repo.name)+"...")
         for pull in openpulls[repo]:
             printdebug(params, "        Found pull request.")
-            result = status(pull, params)                      # Calls the status middleware function
-            if result:                                           # If the status middleware function gives the okay, proceed
-                infodict = {                                   # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
-                    "creator":formatting(pull.user.login),
-                    "repo":repo,
-                    "pull":pull,
-                    "pulls":openpulls,
-                    "client":client,
-                    "org":org,
-                    "members":members,
-                    "status":result
+            result = status(pull, params)                       # Calls the status middleware function
+            if result:                                          # If the status middleware function gives the okay, proceed
+                infodict = {                                    # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                    "creator" : formatting(pull.user.login),
+                    "repo" : repo,
+                    "pull" : pull,
+                    "pulls" : openpulls,
+                    "client" : client,
+                    "org" : org,
+                    "members" : members,
+                    "status" : result
                     }
-                infodict.update(params)                          # Includes the original initialization parameters in that
+                infodict.update(params)                         # Includes the original initialization parameters in that
                 message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
                 if message:                                     # If the middleware function gives the okay,
                     printdebug(params, "        Merging pull request with comment '"+message+"'...")
-                    pull.create_issue_comment(message)           # Create a comment with the middleware function's result and
+                    pull.create_issue_comment(message)          # Create a comment with the middleware function's result and
                     pull.merge(message)                         # Merge using the middleware function's result as the description
                     printdebug(params, "        Pull request merged.")
 
