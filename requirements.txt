@@ -3,4 +3,3 @@ Jinja2==2.7.3
 PyGithub==1.25.0
 Werkzeug==0.9.6
 gunicorn==18.0
-wsgiref==0.1.2

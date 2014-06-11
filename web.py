@@ -10,4 +10,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def wrapper(*args, **kwargs):
-    return main(*args, **kwargs)
+    print("Initializing...")
+    out = main(*args, **kwargs)
+    print("Complete.")
+    return out
