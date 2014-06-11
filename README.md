@@ -14,7 +14,7 @@ The script can also set up hooks to a server that will be sent information whene
 
 ### Setup Instructions:
 
-1. Create and account on heroku
+1. Create an account on heroku
 2. Download and install the heroku command line toolkit
 3. Fork and clone this repository to your computer
 4. Open up a command prompt and login to heroku:
