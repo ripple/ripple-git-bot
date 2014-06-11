@@ -7,9 +7,9 @@ from __future__ import print_function
 # Initialization Parameters:
 
 params = {
-    "lgtms" : ["lgtm"],                                             # What strings register as upvotes
-    "vetoes" : ["veto"],                                             # What strings register as veto votes
-    "downs" : [],                                                   # What strings register as downvotes
+    "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
+    "vetoes" : ["veto"],                                             # What strings register as veto votes ('')
+    "downs" : [],                                                   # What strings register as downvotes ('')
     "message" : "Verified passes tests by <cibotname>. Verified looks good to <voters>.",        # The message displayed by the bot on merge
     "botname" : "ripplebot",                                        # The name of the ripple bot
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
@@ -22,10 +22,8 @@ params = {
                  "issue_comment",
                  "pull_request",
                  "member",
-                 "deployment",
-                 "deployment_status",
                  "status"
                  ],
     "votecount" : 2,                                                # The number of LGTM votes required to merge
-    "debug" : True                                                  # Turns on and off verbose debug output
+    "debug" : True                                                 # Turns on and off verbose debug output
     }
