@@ -9,11 +9,12 @@ import string
 # Initialization Parameters:
 
 params = {
+    "message" : "Merged by <botname>. Verified passes tests by <cibotname>. Verified looks good to <signers>.",        # The message displayed by the bot on merge
     "botname" : "ripplebot",                                        # The name of the ripple bot
     "password" : "ripplepass",                                      # The password to the ripple bot's account
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
     "cibotname" : "mtrippled",                                      # The name of the ripple CI bot
-    "hookurl" : "",                                                  # The url of this file for hooking into
+    "hookurl" : "",                                                 # The url of this file for hooking into
     "hookname" : "ripple-git-bot",                                  # The name of the hook into this file
     "hookevents" : [                                                # The different events the hook is triggered on
                  "commit_comment",
@@ -21,6 +22,7 @@ params = {
                  "pull_request",
                  "member"
                  ],
+    "votecount" : 2,                                                # The number of LGTM votes required to merge
     "debug" : True                                                 # Turns on and off the debug output
     }
 
@@ -49,13 +51,13 @@ def status(pull, params):
         return False
     if checked:
         printdebug(params, "            Status is success.")
-        return "Verified passes tests by "+params["cibotname"]+"."             # This string will be passed to check in infodict as infodict["status"]
+        return True
     else:
         printdebug(params, "            Status is failure.")
         return False
 
 def check(commentlist, memberlist, infodict):
-    """Checks That At Least Two Members Have Commented LGTM And None Commented VETO."""
+    """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
     printdebug(params, "            Checking comments...")
     votes = {}
     if infodict["creator"] in memberlist:
@@ -69,11 +71,12 @@ def check(commentlist, memberlist, infodict):
             elif comment == "veto":             # If a member commented VETO, give them a veto
                 votes[user] = float("-inf")
                 printdebug(params, "                Got VETO vote from "+user+".")
-    if sum(votes.values()) >= 2:
-        printdebug(params, "            Found no VETO votes, at least two LGTM votes.")
-        return "Merged by "+infodict["botname"]+". "+infodict["status"]+". Verified looks good to "+", ".join(votes.keys())+"."
+    if sum(votes.values()) >= infodict["votecount"]:
+        printdebug(params, "            Found no VETO votes, at least "+str(infodict["votecount"])+" LGTM votes.")
+        infodict["signers"] = ", ".join(votes.keys())
+        return messageproc(infodict, infodict["message"])
     else:
-        printdebug(params, "            Found less than two LGTM votes, or a VETO vote.")
+        printdebug(params, "            Found less than "+str(infodict["votecount"])+" LGTM votes, or a VETO vote.")
         return False
 
 # Utility Functions:
@@ -100,6 +103,32 @@ def commentlist(pull):
     for comment in comments:
         commentlist.append((formatting(comment.user.login), formatting(comment.body)))      # Makes a tuple of the name of the commenter and the body of the comment
     return commentlist
+
+def messageproc(params, message):
+    """Replaces Variables In A Message."""
+    out = ""
+    invar = False
+    varstring = ""
+    for c in message:
+        if invar:
+            if c == "<":
+                out += "<"+varstring
+                varstring = ""
+            elif c != ">":
+                varstring += c
+            elif varstring in params:
+                out += str(params[varstring])
+                varstring = ""
+                invar = False
+            else:
+                out += "<"+varstring+">"
+                varstring = ""
+                invar = False
+        elif c == "<":
+            invar = True
+        else:
+            out += c
+    return out
 
 def printdebug(params, message):
     """Prints A Message If The Debug Variable Is Set To True."""
@@ -180,7 +209,7 @@ def main(params):
                 infodict.update(params)                     # Includes the original initialization parameters in that
                 message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
                 if message:                                 # If the middleware function gives the okay,
-                    printdebug(params, "        Merging pull request with comment "+message+"...")
+                    printdebug(params, "        Merging pull request with comment '"+message+"'...")
                     pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
                     pull.merge(message)                     # Merge using the middleware function's result as the description
                     printdebug(params, "        Pull request merged.")
