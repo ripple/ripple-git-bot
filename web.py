@@ -13,6 +13,5 @@ app = Flask(__name__)
 @app.route("/")
 def run():
     print("Initializing...")
-    main(params)
-    print("Complete.")
+    print("Result: "+repr(main(params)))
     return "GitHub pull requests succesfully analyzed."
