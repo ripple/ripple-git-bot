@@ -6,13 +6,13 @@ from __future__ import print_function
 import os
 from flask import Flask
 from gitbot import main
+from config import params
 
 app = Flask(__name__)
 
 @app.route("/")
-def web(*args, **kwargs):
+def run():
     print("Initializing...")
-    print(args, kwargs)
-    main(*args, **kwargs)
+    main(params)
     print("Complete.")
     return "GitHub pull requests succesfully analyzed."
