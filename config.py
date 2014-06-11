@@ -18,7 +18,10 @@ params = {
                  "commit_comment",
                  "issue_comment",
                  "pull_request",
-                 "member"
+                 "member",
+                 "deployment",
+                 "deployment_status",
+                 "status"
                  ],
     "votecount" : 2,                                                # The number of LGTM votes required to merge
     "debug" : True                                                  # Turns on and off the debug output
