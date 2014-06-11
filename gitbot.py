@@ -19,10 +19,14 @@ def status(pull, params):
         name = formatting(status.creator.login)
         printdebug(params, "                Found status from bot "+name+".")
         if name == params["cibotname"]:                                 # Checks if the status was made by the CI bot
-            if formatting(status.state) == "success":                   # Checks if the status from the most recent comment by the CI bot is success
+            state = formatting(status.state)
+            if state == "success":                   # Checks if the status from the most recent comment by the CI bot is success
                 checked = True
                 printdebug(params, "                    CI bot reports commit passed tests.")
                 break
+            elif state == "pending":
+                printdebug(params, "                    CI bot reports commit tests in progress.")
+                return False                                            # Pending doesn't mean success
             else:
                 printdebug(params, "                    CI bot reports commit failed tests.")
                 return False                                            # We only care about the most recent status from the CI bot, so if that isn't success, then end
