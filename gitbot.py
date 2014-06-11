@@ -36,13 +36,13 @@ def status(pull, params):
         printdebug(params, "            Status is failure.")
         return False
 
-def check(commentlist, memberlist, infodict):
+def check(commentlist, memberlist, params):
     """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
     printdebug(params, "            Checking comments...")
     votes = {}
-    if infodict["creator"] in memberlist:
-        votes[infodict["creator"]] = 1          # If the creator is a member, give them a vote
-        printdebug(params, "                Got LGTM vote from "+infodict["creator"]+".")
+    if params["creator"] in memberlist:
+        votes[params["creator"]] = 1          # If the creator is a member, give them a vote
+        printdebug(params, "                Got LGTM vote from "+params["creator"]+".")
     for user, comment in commentlist:
         if user in memberlist:
             if comment == "lgtm":               # If a member commented LGTM, give them a vote
@@ -51,12 +51,12 @@ def check(commentlist, memberlist, infodict):
             elif comment == "veto":             # If a member commented VETO, give them a veto
                 votes[user] = float("-inf")
                 printdebug(params, "                Got VETO vote from "+user+".")
-    if sum(votes.values()) >= infodict["votecount"]:
-        printdebug(params, "            Found no VETO votes, at least "+str(infodict["votecount"])+" LGTM votes.")
-        infodict["voters"] = ", ".join(votes.keys())
-        return messageproc(infodict, infodict["message"])
+    if sum(votes.values()) >= params["votecount"]:
+        printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes.")
+        params["voters"] = ", ".join(votes.keys())
+        return messageproc(params, params["message"])
     else:
-        printdebug(params, "            Found less than "+str(infodict["votecount"])+" LGTM votes, or a VETO vote.")
+        printdebug(params, "            Found less than "+str(params["votecount"])+" LGTM votes, or a VETO vote.")
         return False
 
 # Utility Functions:
@@ -179,7 +179,7 @@ def main(params):
             printdebug(params, "        Found pull request.")
             result = status(pull, params)                       # Calls the status middleware function
             if result:                                          # If the status middleware function gives the okay, proceed
-                infodict = {                                    # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                newparams = {                                   # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
                     "creator" : formatting(pull.user.login),
                     "repo" : repo,
                     "pull" : pull,
@@ -189,8 +189,8 @@ def main(params):
                     "members" : memberlist,
                     "status" : result
                     }
-                infodict.update(params)                         # Includes the original initialization parameters in that
-                message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
+                newparams.update(params)                        # Includes the original initialization parameters in that
+                message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
                 if message:                                     # If the middleware function gives the okay,
                     merges.append((pull, message))
                     printdebug(params, "        Merging pull request with comment '"+message+"'...")
