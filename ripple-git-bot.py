@@ -92,7 +92,7 @@ def formatting(inputstring):
 def listify(pagelist):
     """Turns A github List Into A Python List."""
     out = []
-    for item in pagelist:
+    for item in pagelist:               # github lists can often only be traversed as iters, this turns them into actual lists
         out.append(item)
     return out
 
@@ -107,27 +107,26 @@ def commentlist(pull):
 def messageproc(params, message):
     """Replaces Variables In A Message."""
     out = ""
-    invar = False
-    varstring = ""
+    varstring = None                                # Everything since the last < is stored in varstring
     for c in message:
-        if invar:
-            if c == "<":
+        if varstring != None:
+            if c == "<":                            # If there's another < in the varstring, start a new one
                 out += "<"+varstring
-                varstring = ""
+                varstring = None
             elif c != ">":
                 varstring += c
-            elif varstring in params:
+            elif varstring in params:               # If the varstring exists, substitute it
                 out += str(params[varstring])
-                varstring = ""
-                invar = False
-            else:
+                varstring = None
+            else:                                   # Otherwise, don't do anything
                 out += "<"+varstring+">"
-                varstring = ""
-                invar = False
-        elif c == "<":
-            invar = True
+                varstring = None
+        elif c == "<":                              # If a < is found, open up a new varstring
+            varstring = ""
         else:
             out += c
+    if varstring != None:                           # Check to see whether anything is still left in the varstring
+        out += "<"+varstring
     return out
 
 def printdebug(params, message):
