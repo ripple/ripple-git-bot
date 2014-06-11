@@ -128,7 +128,7 @@ def hookbot(repo, params):
         for hook in repo.get_hooks():                                                               # Checks each hook to see if it is a hook for the bot
             name = formatting(hook.name)
             printdebug(params, "            Found hook "+name+".")
-            if name == params["hookname"]:                                                          # If the hook already exists, exit the function
+            if name in params["hooknames"]:                                                          # If the hook already exists, exit the function
                 printdebug(params, "                Updating hook...")
                 hook.edit(params["hookname"], config, events=params["hookevents"], active=True)     # Updates the hook for the bot
                 return True
