@@ -25,5 +25,5 @@ params = {
                  "status"
                  ],
     "votecount" : 2,                                                # The number of LGTM votes required to merge
-    "debug" : True                                                 # Turns on and off verbose debug output
+    "debug" : True                                                  # Turns on and off verbose debug output
     }
