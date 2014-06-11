@@ -9,7 +9,7 @@ import string
 # Initialization Parameters:
 
 params = {
-    "message" : "Merged by <botname>. Verified passes tests by <cibotname>. Verified looks good to <signers>.",        # The message displayed by the bot on merge
+    "message" : "Verified passes tests by <cibotname>. Verified looks good to <voters>.",        # The message displayed by the bot on merge
     "botname" : "ripplebot",                                        # The name of the ripple bot
     "password" : "ripplepass",                                      # The password to the ripple bot's account
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
@@ -73,7 +73,7 @@ def check(commentlist, memberlist, infodict):
                 printdebug(params, "                Got VETO vote from "+user+".")
     if sum(votes.values()) >= infodict["votecount"]:
         printdebug(params, "            Found no VETO votes, at least "+str(infodict["votecount"])+" LGTM votes.")
-        infodict["signers"] = ", ".join(votes.keys())
+        infodict["voters"] = ", ".join(votes.keys())
         return messageproc(infodict, infodict["message"])
     else:
         printdebug(params, "            Found less than "+str(infodict["votecount"])+" LGTM votes, or a VETO vote.")
@@ -202,7 +202,7 @@ def main(params):
                     "pulls" : openpulls,
                     "client" : client,
                     "org" : org,
-                    "members" : members,
+                    "members" : memberlist,
                     "status" : result
                     }
                 infodict.update(params)                         # Includes the original initialization parameters in that
