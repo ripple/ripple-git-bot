@@ -169,6 +169,7 @@ def main(params):
     # Running The Middleware On The Objects:
 
     printdebug(params, "Running objects...")
+    merges = []
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
         printdebug(params, "    Entering repo "+formatting(repo.name)+"...")
         for pull in openpulls[repo]:
@@ -188,6 +189,7 @@ def main(params):
                 infodict.update(params)                         # Includes the original initialization parameters in that
                 message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
                 if message:                                     # If the middleware function gives the okay,
+                    merges.append((pull, message))
                     printdebug(params, "        Merging pull request with comment '"+message+"'...")
                     pull.create_issue_comment(message)          # Create a comment with the middleware function's result and
                     pull.merge(message)                         # Merge using the middleware function's result as the description
@@ -196,4 +198,4 @@ def main(params):
     # Cleaning Up:
 
     printdebug(params, "Finished.")
-    return client, org, memberlist, openpulls
+    return memberlist, openpulls, merges

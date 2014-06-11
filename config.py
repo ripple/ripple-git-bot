@@ -12,8 +12,8 @@ params = {
     "password" : "ripplepass1",                                      # The password to the ripple bot's account
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
     "cibotname" : "evhub",                                          # The name of the ripple CI bot
-    "hookurl" : "",                                                 # The url of the server file for hooking into
-    "hookname" : "ripplebot",                                        # The name of the hook into this file
+    "hookurl" : "http://ripple-git-bot.herokuapp.com/",             # The url of the server file for hooking into
+    "hookname" : "ripple-git-bot",                                  # The name of the hook into this file
     "hookevents" : [                                                # The different events the hook is triggered on
                  "commit_comment",
                  "issue_comment",
