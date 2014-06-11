@@ -7,9 +7,10 @@ The script can also set up hooks to a server that will be sent information whene
 
 ### Dependencies:
 
-* Python 2.7 branch
+* Python 2.7.X
 * https://github.com/jacquev6/PyGithub
-* Flask + gunicorn web API
+* https://pypi.python.org/pypi/Flask
+* https://pypi.python.org/pypi/gunicorn/
 
 ### Setup Instructions:
 
