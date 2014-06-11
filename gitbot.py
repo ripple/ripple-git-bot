@@ -155,11 +155,11 @@ def main(params):
 
     # Connecting To Github:
 
-    printdebug(params, "Connecting to GitHub under login "+params["botname"]+"...")
-    client = github.Github(params["botname"], params["password"])       # Logs into the bot's account
+    printdebug(params, "Connecting to GitHub as bot "+params["botname"]+"...")
+    client = github.Github(params["token"])                     # Logs into the bot's account
 
     printdebug(params, "Connecting to organization "+params["orgname"]+"...")
-    org = client.get_organization(params["orgname"])                    # Accesses ripple's github organization
+    org = client.get_organization(params["orgname"])            # Accesses ripple's github organization
 
     # Creating The Necessary Objects:
 

@@ -23,9 +23,11 @@ def run():
     printdebug(params, "Initializing...")
     if working:                                                                                                             # Prevents two scripts running at the same time
         printdebug(params, "    Failed due to concurrent boot.")
+    elif not "BOT_TOKEN" in os.environ:
+        printdebug(params, "    Failed due to abscence of login token. Set the BOT_TOKEN environment variable to the bot's login token.")
     else:
         working = True
-        params["password"] = os.environ["BOT_PASSWORD"]                                                                     # Fetch the password from an environment variable
+        params["token"] = os.environ["BOT_TOKEN"]                                                                     # Fetch the password from an environment variable
         memberlist, openpulls, merges = main(params)                                                                        # Runs the script and extracts the parameters
         printdebug(params, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))      # Displays a message with the output parameters
         working = False
