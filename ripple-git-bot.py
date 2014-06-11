@@ -32,13 +32,13 @@ def status(pull, params):
     """Returns Basic Information For The Comments On The Pull In A List."""
     printdebug(params, "            Checking status...")
     checked = False
-    commit = listify(pull.get_commits())[-1]                                         # Only the last commit will have CI build statuses on it
+    commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
     printdebug(params, "            Found commit.")
     checked = False
     for status in commit.get_statuses():                                  # Loops through each status on the commit
         name = formatting(status.creator.login)
         printdebug(params, "                Found status from bot "+name+".")
-        if name == params["cibotname"]:       # Checks if the status was made by the CI bot
+        if name == params["cibotname"]:                                   # Checks if the status was made by the CI bot
             if formatting(status.state) == "success":                     # Checks if the status from the most recent comment by the CI bot is success
                 checked = True
                 printdebug(params, "                    CI bot reports commit passed tests.")
@@ -139,16 +139,16 @@ def hookbot(repo, params):
     printdebug(params, "        Scanning hooks...")
     if params["hookurl"]:
         config = {
-            "url":params["hookurl"]         # The config for the hook
+            "url":params["hookurl"]                                                                 # The config for the hook
             }
-        for hook in repo.get_hooks():                                     # Checks each hook to see if it is a hook for the bot
+        for hook in repo.get_hooks():                                                               # Checks each hook to see if it is a hook for the bot
             name = formatting(hook.name)
             printdebug(params, "            Found hook "+name+".")
-            if name == params["hookname"]:               # If the hook already exists, exit the function
+            if name == params["hookname"]:                                                          # If the hook already exists, exit the function
                 printdebug(params, "                Updating hook...")
-                hook.edit(params["hookname"], config, events=params["hookevents"], active=True)             # Updates the hook for the bot
+                hook.edit(params["hookname"], config, events=params["hookevents"], active=True)     # Updates the hook for the bot
         printdebug(params, "        Creating new hook "+params["hookname"]+"...")
-        repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)              # Creates a hook for the bot
+        repo.create_hook(params["hookname"], config, events=params["hookevents"], active=True)      # Creates a hook for the bot
     else:
         printdebug(params, "            No hook url found.")
 
@@ -167,12 +167,12 @@ def main(params):
     # Creating The Necessary Objects:
 
     printdebug(params, "Scanning members...")
-    members = org.get_members()                          # Gets a list of members
+    members = org.get_members()                                  # Gets a list of members
     memberlist = []
     for member in members:
         name = formatting(member.login)
         printdebug(params, "    Found member "+name+".")
-        memberlist.append(name)     # Makes a list of member names
+        memberlist.append(name)                                 # Makes a list of member names
 
     printdebug(params, "Scanning repositories...")
     openpulls = {}
@@ -193,9 +193,9 @@ def main(params):
         printdebug(params, "    Entering repo "+formatting(repo.name)+"...")
         for pull in openpulls[repo]:
             printdebug(params, "        Found pull request.")
-            result = status(pull, params)      # Calls the status middleware function
-            if result:                                      # If the status middleware function gives the okay, proceed
-                infodict = {                                # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+            result = status(pull, params)                      # Calls the status middleware function
+            if result:                                           # If the status middleware function gives the okay, proceed
+                infodict = {                                   # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
                     "creator":formatting(pull.user.login),
                     "repo":repo,
                     "pull":pull,
@@ -205,12 +205,12 @@ def main(params):
                     "members":members,
                     "status":result
                     }
-                infodict.update(params)                     # Includes the original initialization parameters in that
+                infodict.update(params)                          # Includes the original initialization parameters in that
                 message = check(commentlist(pull), memberlist, infodict)        # Calls the check middleware function
-                if message:                                 # If the middleware function gives the okay,
+                if message:                                     # If the middleware function gives the okay,
                     printdebug(params, "        Merging pull request with comment '"+message+"'...")
-                    pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
-                    pull.merge(message)                     # Merge using the middleware function's result as the description
+                    pull.create_issue_comment(message)           # Create a comment with the middleware function's result and
+                    pull.merge(message)                         # Merge using the middleware function's result as the description
                     printdebug(params, "        Pull request merged.")
 
     # Cleaning Up:
