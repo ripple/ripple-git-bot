@@ -22,7 +22,8 @@ params = {
                  "issue_comment",
                  "pull_request",
                  "member",
-                 "status"
+                 "status",
+                 "create"
                  ],
     "votecount" : 2,                                                # The number of LGTM votes required to merge
     "debug" : True                                                  # Turns on and off verbose debug output
