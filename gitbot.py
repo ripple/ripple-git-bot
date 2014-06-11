@@ -45,16 +45,19 @@ def check(commentlist, memberlist, params):
     printdebug(params, "            Checking comments...")
     votes = {}
     if params["creator"] in memberlist:
-        votes[params["creator"]] = 1          # If the creator is a member, give them a vote
+        votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
         printdebug(params, "                Got LGTM vote from "+params["creator"]+".")
     for user, comment in commentlist:
         if user in memberlist:
-            if comment == "lgtm":               # If a member commented LGTM, give them a vote
+            if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
                 votes[user] = 1
                 printdebug(params, "                Got LGTM vote from "+user+".")
-            elif comment == "veto":             # If a member commented VETO, give them a veto
+            elif startswithany(comment, params["vetoes"]):  # If a member commented VETO, give them a veto
                 votes[user] = float("-inf")
                 printdebug(params, "                Got VETO vote from "+user+".")
+            elif startswithany(comment, params["downs"]):   # If downs is set up, this will allow downvoting
+                votes[user] = -1
+                printdebug(params, "                Got DOWN vote from "+user+".")
     if sum(votes.values()) >= params["votecount"]:
         printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes.")
         params["voters"] = ", ".join(votes.keys())
@@ -64,6 +67,13 @@ def check(commentlist, memberlist, params):
         return False
 
 # Utility Functions:
+
+def startswithany(inputstring, inputlist):
+    """Determines Whether A String Starts With Any Of The Items In A List."""
+    for item in inputlist:
+        if inputstring.startswith(item):
+            return True
+    return False
 
 def formatting(inputstring):
     """Insures All Strings Follow A Uniform Format For Ease Of Comparison."""

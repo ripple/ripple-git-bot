@@ -13,19 +13,20 @@ from config import params
 global working
 working = False
 
-app = Flask(__name__)
+app = Flask(__name__)           # Creates the application
 
 # Running The Main Function:
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])                                                                                    # Registers the script to run on hook or visit
 def run():
     global working
     printdebug(params, "Initializing...")
-    if working:
+    if working:                                                                                                             # Prevents two scripts running at the same time
         printdebug(params, "    Failed due to concurrent boot.")
     else:
         working = True
-        memberlist, openpulls, merges = main(params)
-        printdebug(params, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))
+        params["password"] = os.environ["BOT_PASSWORD"]                                                                     # Fetch the password from an environment variable
+        memberlist, openpulls, merges = main(params)                                                                        # Runs the script and extracts the parameters
+        printdebug(params, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))      # Displays a message with the output parameters
         working = False
-        return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."
+        return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."                      # Returns a summary string for website visitors
