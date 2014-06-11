@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 # Running The Main Function:
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def run():
     global working
     printdebug(params, "Initializing...")
