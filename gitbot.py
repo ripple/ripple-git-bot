@@ -157,7 +157,7 @@ def repoparams(params, name):
     """Sets The Repository-Specific Parameters."""
     newparams = dict(params)
     if name in params["repoparams"]:
-        newparams.update(params["repoparams"]["name"])          # repoparams should be of the format { reponame : { newparam : value } }
+        newparams.update(params["repoparams"][name])            # repoparams should be of the format { reponame : { newparam : value } }
     return newparams
 
 # The Main Function:
