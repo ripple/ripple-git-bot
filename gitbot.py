@@ -126,7 +126,11 @@ def messageproc(params, message):
 def printdebug(params, message):
     """Prints A Message If The Debug Variable Is Set To True."""
     if params["debug"]:
-        print(message)
+        if not "count" in params:
+            params["count"] = 0
+        for line in message.split("\n"):
+            params["count"] += 1
+            print(str(params["count"])+". "+str(line))
 
 def hookbot(repo, params):
     """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
