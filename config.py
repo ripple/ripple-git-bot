@@ -3,10 +3,15 @@
 # Imported Modules:
 
 from __future__ import print_function
+import os
 
 # Initialization Parameters:
 
 params = {
+    "token" : "",                                                   # The login token for the bot (this should usually be passed as an environment variable)
+    "orgname" : "ripple",                                            # The name of ripple's github organization
+    "cibotname" : "mtrippled",                                      # The name of the ripple CI bot
+    "hookurl" : "http://ripple-git-bought.herokuapp.com/",          # The url of the server file for hooking into
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                             # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
@@ -25,6 +30,15 @@ params = {
                  "status",
                  "create"
                  ],
+    "message" : "Verified passes tests by <cibotname>. Verified looks good to <voters>.",        # The message displayed by the bot on merge
+    "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
+    "vetoes" : ["veto"],                                             # What strings register as veto votes ('')
+    "downs" : [],                                                   # What strings register as downvotes ('')
     "votecount" : 2,                                                # The number of LGTM votes required to merge
     "debug" : True                                                  # Turns on and off verbose debug output
     }
+
+for param in params:
+    name = "BOT_"+param.upper()                                     # Proper formatting for environment variable overrides is BOT_VAR
+    if name in os.environ:
+        params[param] = type(params[param])(os.environ[name])       # Make sure to convert to the proper type first

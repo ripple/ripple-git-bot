@@ -155,7 +155,7 @@ def main(params):
 
     # Connecting To Github:
 
-    printdebug(params, "Connecting to GitHub as bot "+params["botname"]+"...")
+    printdebug(params, "Connecting to GitHub as bot...")
     client = github.Github(params["token"])                     # Logs into the bot's account
 
     printdebug(params, "Connecting to organization "+params["orgname"]+"...")

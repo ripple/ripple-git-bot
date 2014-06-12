@@ -28,7 +28,6 @@ The script can also set up hooks to a server that will be sent information whene
 
 6. Edit the config variables in your new repository:
 	* Set "hookurl" to the url you just got from running "heroku create"
-	* Set "botname" to the name the bot will be called by
 	* Set "orgname" to the name of the organization the bot will check (note that the bot must have access to this organization)
 	* Set "cibotname" to the username of the CI bot that updates the status of the repositories
 7. Create a GitHub account for the bot
