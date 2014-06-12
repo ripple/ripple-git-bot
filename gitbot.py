@@ -20,7 +20,7 @@ def status(pull, params):
         printdebug(params, "                Found status from bot "+name+".")
         if name == params["cibotname"]:                                 # Checks if the status was made by the CI bot
             state = formatting(status.state)
-            if state == "success":                   # Checks if the status from the most recent comment by the CI bot is success
+            if state == "success":                                      # Checks if the status from the most recent comment by the CI bot is success
                 checked = True
                 printdebug(params, "                    CI bot reports commit passed tests.")
                 break
@@ -196,14 +196,15 @@ def main(params):
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
         name = formatting(repo.name)
         newparams = repoparams(params, name)
-        printdebug(newparams, "    Scanning repository "+name+"...")
-        hookbot(repo, newparams)                                # Makes sure the bot is hooked into the repository
-        openpulls[repo] = []
-        for pull in repo.get_pulls():                           # Loops through each pull request in each repo
-            printdebug(newparams, "        Found pull request.")
-            if not pull.is_merged() and pull.mergeable:         # Checks whether the pull request is still open and automatically mergeable
-                printdebug(newparams, "            Pull request is open and mergeable.")
-                openpulls[repo].append(pull)
+        if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
+            printdebug(newparams, "    Scanning repository "+name+"...")
+            hookbot(repo, newparams)                            # Makes sure the bot is hooked into the repo
+            openpulls[repo] = []
+            for pull in repo.get_pulls():                       # Loops through each pull request in each repo
+                printdebug(newparams, "        Found pull request.")
+                if not pull.is_merged() and pull.mergeable:     # Checks whether the pull request is still open and automatically mergeable
+                    printdebug(newparams, "            Pull request is open and mergeable.")
+                    openpulls[repo].append(pull)
 
     params.update({                                             # Adds the openpulls to the params
         "pulls" : openpulls
@@ -216,24 +217,25 @@ def main(params):
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
         name = formatting(repo.name)
         newparams = repoparams(params, name)
-        printdebug(newparams, "    Entering repository "+name+"...")
-        for pull in openpulls[repo]:
-            printdebug(newparams, "        Found pull request.")
-            result = status(pull, newparams)                    # Calls the status middleware function
-            if result:                                          # If the status middleware function gives the okay, proceed
-                newparams.update({                              # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
-                    "creator" : formatting(pull.user.login),
-                    "repo" : repo,
-                    "pull" : pull,
-                    "status" : result
-                    })
-                message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
-                if message:                                     # If the middleware function gives the okay,
-                    merges.append((pull, message))
-                    printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
-                    pull.create_issue_comment(message)          # Create a comment with the middleware function's result and
-                    pull.merge(message)                         # Merge using the middleware function's result as the description
-                    printdebug(newparams, "        Pull request merged.")
+        if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
+            printdebug(newparams, "    Entering repository "+name+"...")
+            for pull in openpulls[repo]:
+                printdebug(newparams, "        Found pull request.")
+                result = status(pull, newparams)                # Calls the status middleware function
+                if result:                                      # If the status middleware function gives the okay, proceed
+                    newparams.update({                          # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                        "creator" : formatting(pull.user.login),
+                        "repo" : repo,
+                        "pull" : pull,
+                        "status" : result
+                        })
+                    message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
+                    if message:                                 # If the middleware function gives the okay,
+                        merges.append((pull, message))
+                        printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
+                        pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
+                        pull.merge(message)                     # Merge using the middleware function's result as the description
+                        printdebug(newparams, "        Pull request merged.")
 
     # Cleaning Up:
 

@@ -40,6 +40,7 @@ params = {
             "votecount" : 3
             }
         },
+    "enabled" : True,                                               # Whether or not the bot is enabled
     "debug" : True                                                  # Turns on and off verbose debug output
     }
 
