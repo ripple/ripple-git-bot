@@ -35,6 +35,11 @@ params = {
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
     "votecount" : 2,                                                # The number of LGTM votes required to merge
+    "repoparams" : {                                                # Specific parameters for each repo
+        "rippled" : {
+            "votecount" : 3
+            }
+        },
     "debug" : True                                                  # Turns on and off verbose debug output
     }
 

@@ -153,6 +153,13 @@ def hookbot(repo, params):
         printdebug(params, "            No hook url found.")
         return False
 
+def repoparams(params, name):
+    """Sets The Repository-Specific Parameters."""
+    newparams = dict(params)
+    if name in params["repoparams"]:
+        newparams.update(params["repoparams"]["name"])          # repoparams should be of the format { reponame : { newparam : value } }
+    return newparams
+
 # The Main Function:
 
 def main(params):
@@ -165,6 +172,11 @@ def main(params):
     printdebug(params, "Connecting to organization "+params["orgname"]+"...")
     org = client.get_organization(params["orgname"])            # Accesses ripple's github organization
 
+    params.update({                                             # Adds the client and the org to the params
+        "client" : client,
+        "org" : org
+        })
+
     # Creating The Necessary Objects:
 
     printdebug(params, "Scanning members...")
@@ -175,46 +187,53 @@ def main(params):
         printdebug(params, "    Found member "+name+".")
         memberlist.append(name)                                 # Makes a list of member names
 
+    params.update({                                             # Adds the memberlist to the params
+        "members" : memberlist
+        })
+
     printdebug(params, "Scanning repositories...")
     openpulls = {}
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
-        printdebug(params, "    Scanning repository "+formatting(repo.name)+"...")
-        hookbot(repo, params)                                   # Makes sure the bot is hooked into the repository
+        name = formatting(repo.name)
+        newparams = repoparams(params, name)
+        printdebug(newparams, "    Scanning repository "+name+"...")
+        hookbot(repo, newparams)                                # Makes sure the bot is hooked into the repository
         openpulls[repo] = []
         for pull in repo.get_pulls():                           # Loops through each pull request in each repo
-            printdebug(params, "        Found pull request.")
+            printdebug(newparams, "        Found pull request.")
             if not pull.is_merged() and pull.mergeable:         # Checks whether the pull request is still open and automatically mergeable
-                printdebug(params, "            Pull request is open and mergeable.")
+                printdebug(newparams, "            Pull request is open and mergeable.")
                 openpulls[repo].append(pull)
+
+    params.update({                                             # Adds the openpulls to the params
+        "pulls" : openpulls
+        })
 
     # Running The Middleware On The Objects:
 
     printdebug(params, "Running objects...")
     merges = []
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
-        printdebug(params, "    Entering repo "+formatting(repo.name)+"...")
+        name = formatting(repo.name)
+        newparams = repoparams(params, name)
+        printdebug(newparams, "    Entering repository "+name+"...")
         for pull in openpulls[repo]:
-            printdebug(params, "        Found pull request.")
-            result = status(pull, params)                       # Calls the status middleware function
+            printdebug(newparams, "        Found pull request.")
+            result = status(pull, newparams)                    # Calls the status middleware function
             if result:                                          # If the status middleware function gives the okay, proceed
-                newparams = {                                   # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                newparams.update({                              # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
                     "creator" : formatting(pull.user.login),
                     "repo" : repo,
                     "pull" : pull,
-                    "pulls" : openpulls,
-                    "client" : client,
-                    "org" : org,
-                    "members" : memberlist,
                     "status" : result
-                    }
-                newparams.update(params)                        # Includes the original initialization parameters in that
+                    })
                 message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
                 if message:                                     # If the middleware function gives the okay,
                     merges.append((pull, message))
-                    printdebug(params, "        Merging pull request with comment '"+message+"'...")
+                    printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
                     pull.create_issue_comment(message)          # Create a comment with the middleware function's result and
                     pull.merge(message)                         # Merge using the middleware function's result as the description
-                    printdebug(params, "        Pull request merged.")
+                    printdebug(newparams, "        Pull request merged.")
 
     # Cleaning Up:
 
