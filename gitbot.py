@@ -52,6 +52,7 @@ def check(commentlist, memberlist, params):
         votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
         printdebug(params, "                Got LGTM vote from "+params["creator"]+".")
     for user, comment, date in commentlist:
+        params["comments"].append(comment)
         if user in memberlist:
             voted = True
             if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
@@ -240,16 +241,19 @@ def main(params):
                 result = status(pull, newparams)                # Calls the status middleware function
                 if result:                                      # If the status middleware function gives the okay, proceed
                     newparams.update({                          # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
-                        "status" : result
+                        "status" : result,
+                        "comments" : []
                         })
                     message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
                     if message:                                 # If the middleware function gives the okay,
                         merges.append((pull, message))
                         printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
-                        pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
+                        if not message in newparams["comments"]:
+                            pull.create_issue_comment(message)      # Create a comment with the middleware function's result
+                            printdebug(newparams, "            Pull request commented on.")
                         if newparams["merge"]:
                             pull.merge(message)                     # Merge using the middleware function's result as the description
-                            printdebug(newparams, "        Pull request merged.")
+                            printdebug(newparams, "            Pull request merged.")
 
     # Cleaning Up:
 
