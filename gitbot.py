@@ -56,7 +56,6 @@ def check(commentlist, memberlist, params):
         recvotes[params["author"]] = 1
         printdebug(params, "                Got recent LGTM vote from author "+params["author"]+".")
     for user, comment, date in commentlist:
-        params["comments"].append(comment)
         if user in memberlist:
             voted = True
             if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
@@ -70,9 +69,11 @@ def check(commentlist, memberlist, params):
                 printdebug(params, "                Got DOWN vote from "+user+".")
             else:
                 voted = False
-            if voted and date > params["date"]:
-                recvotes[user] = votes[user]
-                printdebug(params, "                    Vote qualifies as recent.")
+            if date > params["date"]:
+                params["comments"].append(comment)
+                if voted:
+                    recvotes[user] = votes[user]
+                    printdebug(params, "                    Vote qualifies as recent.")
     if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
         printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
         params["voters"] = ", ".join(votes.keys())
