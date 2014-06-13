@@ -22,7 +22,7 @@ def status(pull, params):
     for status in commit.get_statuses():                                # Loops through each status on the commit
         name = formatting(status.creator.login)
         printdebug(params, "                Found status from bot "+name+".")
-        if name == params["cibotname"]:                                 # Checks if the status was made by the CI bot
+        if name in params["cibotnames"]:                                # Checks if the status was made by the CI bot
             state = formatting(status.state)
             if state == "success":                                      # Checks if the status from the most recent comment by the CI bot is success
                 checked = True

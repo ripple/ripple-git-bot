@@ -20,7 +20,7 @@ def clean(haystack, needle=""):
 params = {
     "token" : "",                                                   # The login token for the bot (this should usually be passed as an environment variable)
     "orgname" : "",                                                 # The name of ripple's github organization
-    "cibotname" : "",                                               # The name of the ripple CI bot
+    "cibotnames" : [],                                              # The names of ripple's CI bots
     "hookurl" : "",                                                 # The url of the server file for hooking into
     "votecount" : 3,                                                # The number of LGTM votes required to merge
     "recvotes" : 3,                                                 # How many of those have to be after the most recent commit

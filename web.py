@@ -20,6 +20,7 @@ app = Flask(__name__)           # Creates the application
 def run():
     global working
     printdebug(params, "Initializing...")
+    printdebug(params, "Using parameters: "+repr(params))
     if working:                                                             # Prevents two scripts running at the same time
         printdebug(params, "    Failed due to concurrent boot.")
     elif not (params["orgname"] and params["cibotname"] and params["message"] and params["votecount"] and params["debug"]):
