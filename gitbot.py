@@ -179,9 +179,11 @@ def repoparams(params, name, search="repoparams"):
 
 def pullparams(params, title):
     """Sets Pull-Request-Title-Specific Parameters."""
-    tag = formatting(title.split("[", 1)[1].split("]", 1)[0])   # A tag is of the format [Tag]
-    return repoparams(params, tag, search="tagparams")          # Uses repoparams for the actual checking, but with the tagparams variable
-        
+    if title.startswith("["):
+        tag = formatting(title[1:].split("]", 1)[0])            # A tag is of the format [Tag]
+        return repoparams(params, tag, search="tagparams")      # Uses repoparams for the actual checking, but with the tagparams variable
+    else:
+        return dict(params)
 
 # The Main Function:
 
