@@ -13,7 +13,8 @@ def status(pull, params):
     printdebug(params, "            Checking status...")
     commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
     params.update({                                                     # Adds the most recent commit to the params
-        "commit" : commit
+        "commit" : commit,
+        "date" : commit.commit.author.date
         })
     printdebug(params, "            Found commit.")
     checked = False
@@ -46,11 +47,13 @@ def check(commentlist, memberlist, params):
     """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
     printdebug(params, "            Checking comments...")
     votes = {}
+    recvotes = {}
     if params["creator"] in memberlist:
         votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
         printdebug(params, "                Got LGTM vote from "+params["creator"]+".")
-    for user, comment in commentlist:
+    for user, comment, date in commentlist:
         if user in memberlist:
+            voted = True
             if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
                 votes[user] = 1
                 printdebug(params, "                Got LGTM vote from "+user+".")
@@ -60,12 +63,18 @@ def check(commentlist, memberlist, params):
             elif startswithany(comment, params["downs"]):   # If downs is set up, this will allow downvoting
                 votes[user] = -1
                 printdebug(params, "                Got DOWN vote from "+user+".")
-    if sum(votes.values()) >= params["votecount"]:
-        printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes.")
+            else:
+                voted = False
+            if voted and date > params["date"] and user != params["creator"]:
+                recvotes[user] = votes[user]
+                printdebug(params, "                    Vote qualifies as recent.")
+    if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
+        printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
         params["voters"] = ", ".join(votes.keys())
+        params["recvoters"] = ", ".join(recvotes.keys())
         return messageproc(params, params["message"])
     else:
-        printdebug(params, "            Found less than "+str(params["votecount"])+" LGTM votes, or a VETO vote.")
+        printdebug(params, "            Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
         return False
 
 # Utility Functions:
@@ -97,7 +106,7 @@ def commentlist(pull):
     comments = pull.get_issue_comments()
     commentlist = []
     for comment in comments:
-        commentlist.append((formatting(comment.user.login), formatting(comment.body)))      # Makes a tuple of the name of the commenter and the body of the comment
+        commentlist.append((formatting(comment.user.login), formatting(comment.body), comment.created_at))      # Makes a tuple of the name, the body, and the date
     return commentlist
 
 def messageproc(params, message):
@@ -223,12 +232,14 @@ def main(params):
             printdebug(newparams, "    Entering repository "+name+"...")
             for pull in openpulls[repo]:
                 printdebug(newparams, "        Found pull request.")
+                newparams.update({                              # Adds parameters for use by status
+                        "creator" : formatting(pull.user.login),
+                        "repo" : repo,
+                        "pull" : pull
+                        })
                 result = status(pull, newparams)                # Calls the status middleware function
                 if result:                                      # If the status middleware function gives the okay, proceed
                     newparams.update({                          # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
-                        "creator" : formatting(pull.user.login),
-                        "repo" : repo,
-                        "pull" : pull,
                         "status" : result
                         })
                     message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function

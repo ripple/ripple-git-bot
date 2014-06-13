@@ -15,7 +15,7 @@ params = {
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
-    "message" : "Verified passes tests by <cibotname>. Verified looks good to <voters>.",        # The message displayed by the bot on merge
+    "message" : "Ready to merge: Travis build checks out, pull request looks good to <voters>, most recent commit looks good to <recvoters>.",        # The message displayed by the bot on merge
     "botname" : "ripplebot",                                        # The name of the ripple bot
     "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
     "cibotname" : "evhub",                                          # The name of the ripple CI bot
@@ -34,11 +34,12 @@ params = {
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
-    "votecount" : 3,                                                # The number of LGTM votes required to merge
+    "votecount" : 2,                                                # The number of LGTM votes required to merge
+    "recvotes" : 1,                                                 # How many of those have to be after the most recent commit
     "repoparams" : {                                                # Specific parameters for each repo
         },
     "enabled" : True,                                               # Whether or not the bot is enabled
-    "merge" : True,                                                 # Whether or not the bot should actually merge, or just comment
+    "merge" : False,                                                # Whether or not the bot should actually merge, or just comment
     "debug" : True                                                  # Turns on and off verbose debug output
     }
 
