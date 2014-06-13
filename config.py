@@ -39,8 +39,17 @@ params = {
                  "create"
                  ],
     "repoparams" : {                                                # Specific parameters for each repo
+        "ripple-lib" : {
+            "enabled" : True
+            },
+        "ripple-client" : {
+            "enabled" : True
+            },
+        "gatewayd" : {
+            "enabled" : True
+            }
         },
-    "enabled" : True,                                               # Whether or not the bot is enabled
+    "enabled" : False,                                              # Whether or not the bot is enabled
     "merge" : False,                                                # Whether or not the bot should actually merge, or just comment
     "debug" : True                                                  # Turns on and off verbose debug output
     }
