@@ -23,7 +23,7 @@ def run():
     printdebug(params, "Using parameters: "+repr(params))
     if working:                                                             # Prevents two scripts running at the same time
         printdebug(params, "    Failed due to concurrent boot.")
-    elif not (params["orgname"] and params["cibotname"] and params["message"] and params["votecount"] and params["debug"]):
+    elif not (params["orgname"] and params["cibotnames"] and params["message"] and params["votecount"] and params["debug"]):
         printdebug(params, "    Failed due to abscence of requisite config variables. Check your config.py for errors.")
     elif not params["token"]:
         printdebug(params, "    Failed due to abscence of login token. Set the BOT_TOKEN environment variable to the bot's login token.")
