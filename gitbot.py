@@ -252,11 +252,11 @@ def main(params):
                     if message:                                 # If the middleware function gives the okay,
                         merges.append((pull, message))
                         printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
-                        if not message in newparams["comments"]:
-                            pull.create_issue_comment(message)      # Create a comment with the middleware function's result
+                        if not formatting(message) in newparams["comments"]:
+                            pull.create_issue_comment(message)  # Create a comment with the middleware function's result
                             printdebug(newparams, "            Pull request commented on.")
                         if newparams["merge"]:
-                            pull.merge(message)                     # Merge using the middleware function's result as the description
+                            pull.merge(message)                 # Merge using the middleware function's result as the description
                             printdebug(newparams, "            Pull request merged.")
 
     # Cleaning Up:
