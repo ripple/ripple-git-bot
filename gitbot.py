@@ -14,7 +14,8 @@ def status(pull, params):
     commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
     params.update({                                                     # Adds the most recent commit to the params
         "commit" : commit,
-        "date" : commit.commit.author.date
+        "date" : commit.commit.author.date,
+        "author" : formatting(commit.author.login)
         })
     printdebug(params, "            Found commit.")
     checked = False
@@ -50,7 +51,10 @@ def check(commentlist, memberlist, params):
     recvotes = {}
     if params["creator"] in memberlist:
         votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
-        printdebug(params, "                Got LGTM vote from "+params["creator"]+".")
+        printdebug(params, "                Got LGTM vote from creator "+params["creator"]+".")
+    if params["author"] in memberlist:
+        recvotes[params["author"]] = 1
+        printdebug(params, "                Got recent LGTM vote from author "+params["author"]+".")
     for user, comment, date in commentlist:
         params["comments"].append(comment)
         if user in memberlist:
@@ -66,7 +70,7 @@ def check(commentlist, memberlist, params):
                 printdebug(params, "                Got DOWN vote from "+user+".")
             else:
                 voted = False
-            if voted and date > params["date"] and user != params["creator"]:
+            if voted and date > params["date"]:
                 recvotes[user] = votes[user]
                 printdebug(params, "                    Vote qualifies as recent.")
     if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
