@@ -5,6 +5,16 @@
 from __future__ import print_function
 import os
 
+# Utility Functions:
+
+def clean(haystack, needle=""):
+    """Cleans A Needle From A Haystack."""
+    out = []
+    for item in haystack:
+        if item != needle:
+            out.append(item)
+    return out
+
 # Initialization Parameters:
 
 params = {
@@ -38,4 +48,15 @@ params = {
 for param in params:
     name = "BOT_"+param.upper()                                     # Proper formatting for environment variable overrides is BOT_VAR
     if name in os.environ:
-        params[param] = type(params[param])(os.environ[name])       # Make sure to convert to the proper type first
+        constr = type(params[param])
+        params[param] = str(os.environ[name])
+        if constr == list:                                          # Allow semicolon seperating in enviro vars for lists
+            params[param] = clean(params[param].split(";"))
+        elif constr == bool:                                        # Allow bool names in enviro vars for bools
+            params[param] = params[param].lower()
+            if params[param] == "false":
+                params[param] = False
+            else:
+                params[param] = bool(params[param])
+        else:
+            params[param] = constr(params[param])                   # Make sure to convert to the proper type
