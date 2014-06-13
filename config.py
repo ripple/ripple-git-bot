@@ -12,14 +12,12 @@ params = {
     "orgname" : "",                                                 # The name of ripple's github organization
     "cibotname" : "",                                               # The name of the ripple CI bot
     "hookurl" : "",                                                 # The url of the server file for hooking into
+    "votecount" : 2,                                                # The number of LGTM votes required to merge
+    "recvotes" : 1,                                                 # How many of those have to be after the most recent commit
+    "message" : "Ready to merge: Travis build checks out, pull request looks good to <voters>, most recent commit looks good to <recvoters>.",        # The message displayed by the bot on merge
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
-    "message" : "Ready to merge: Travis build checks out, pull request looks good to <voters>, most recent commit looks good to <recvoters>.",        # The message displayed by the bot on merge
-    "botname" : "ripplebot",                                        # The name of the ripple bot
-    "orgname" : "ripple-git-test",                                  # The name of ripple's github organization
-    "cibotname" : "evhub",                                          # The name of the ripple CI bot
-    "hookurl" : "http://ripple-git-bot.herokuapp.com/",             # The url of the server file for hooking into
     "hookname" : "web",                                             # The new name of the hooks into this file
     "hooknames" : ["web"],                                          # All the names of the hooks into this file
     "hookevents" : [                                                # The different events the hook is triggered on
@@ -30,12 +28,6 @@ params = {
                  "status",
                  "create"
                  ],
-    "message" : "Verified passes tests by <cibotname>. Verified looks good to <voters>.",        # The message displayed by the bot on merge
-    "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
-    "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
-    "downs" : [],                                                   # What strings register as downvotes ('')
-    "votecount" : 2,                                                # The number of LGTM votes required to merge
-    "recvotes" : 1,                                                 # How many of those have to be after the most recent commit
     "repoparams" : {                                                # Specific parameters for each repo
         },
     "enabled" : True,                                               # Whether or not the bot is enabled
