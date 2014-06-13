@@ -170,12 +170,18 @@ def hookbot(repo, params):
         printdebug(params, "            No hook url found.")
         return False
 
-def repoparams(params, name):
+def repoparams(params, name, search="repoparams"):
     """Sets The Repository-Specific Parameters."""
     newparams = dict(params)
     if name in params["repoparams"]:
         newparams.update(params["repoparams"][name])            # repoparams should be of the format { reponame : { newparam : value } }
     return newparams
+
+def pullparams(params, title):
+    """Sets Pull-Request-Title-Specific Parameters."""
+    tag = formatting(title.split("[", 1)[1].split("]", 1)[0])   # A tag is of the format [Tag]
+    return repoparams(params, tag, search="tagparams")          # Uses repoparams for the actual checking, but with the tagparams variable
+        
 
 # The Main Function:
 
@@ -243,6 +249,7 @@ def main(params):
                         "repo" : repo,
                         "pull" : pull
                         })
+                newparams = pullparams(newparams, formatting(pull.title))
                 result = status(pull, newparams)                # Calls the status middleware function
                 if result:                                      # If the status middleware function gives the okay, proceed
                     newparams.update({                          # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
