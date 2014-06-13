@@ -34,13 +34,11 @@ params = {
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
     "downs" : [],                                                   # What strings register as downvotes ('')
-    "votecount" : 2,                                                # The number of LGTM votes required to merge
+    "votecount" : 3,                                                # The number of LGTM votes required to merge
     "repoparams" : {                                                # Specific parameters for each repo
-        "rippled" : {
-            "votecount" : 3
-            }
         },
     "enabled" : True,                                               # Whether or not the bot is enabled
+    "merge" : True,                                                 # Whether or not the bot should actually merge, or just comment
     "debug" : True                                                  # Turns on and off verbose debug output
     }
 

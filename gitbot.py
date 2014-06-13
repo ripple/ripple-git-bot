@@ -11,8 +11,10 @@ import string
 def status(pull, params):
     """Checks Whether Or Not pull Has Been Signed Off On By The CI Build Manager."""
     printdebug(params, "            Checking status...")
-    checked = False
     commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
+    params.update({                                                     # Adds the most recent commit to the params
+        "commit" : commit
+        })
     printdebug(params, "            Found commit.")
     checked = False
     for status in commit.get_statuses():                                # Loops through each status on the commit
@@ -234,8 +236,9 @@ def main(params):
                         merges.append((pull, message))
                         printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
                         pull.create_issue_comment(message)      # Create a comment with the middleware function's result and
-                        pull.merge(message)                     # Merge using the middleware function's result as the description
-                        printdebug(newparams, "        Pull request merged.")
+                        if newparams["merge"]:
+                            pull.merge(message)                     # Merge using the middleware function's result as the description
+                            printdebug(newparams, "        Pull request merged.")
 
     # Cleaning Up:
 
