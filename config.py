@@ -22,8 +22,8 @@ params = {
     "orgname" : "",                                                 # The name of ripple's github organization
     "cibotname" : "",                                               # The name of the ripple CI bot
     "hookurl" : "",                                                 # The url of the server file for hooking into
-    "votecount" : 2,                                                # The number of LGTM votes required to merge
-    "recvotes" : 2,                                                 # How many of those have to be after the most recent commit
+    "votecount" : 3,                                                # The number of LGTM votes required to merge
+    "recvotes" : 3,                                                 # How many of those have to be after the most recent commit
     "message" : "Ready to merge: Travis build checks out, most recent commit looks good to <recvoters>.",        # The message displayed by the bot on merge
     "lgtms" : ["lgtm"],                                             # What strings register as upvotes (no leading or trailing whitespace and all lowercase)
     "vetoes" : ["veto"],                                            # What strings register as veto votes ('')
