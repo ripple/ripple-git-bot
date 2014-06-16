@@ -24,4 +24,8 @@ def logproc(logs):
 # Running Log Processing:
 
 if __name__ == "__main__":
-    print(logproc(raw_input("Paste Logs: ")))
+    inputstring = True
+    while inputstring:
+        if True != inputstring:
+            print(logproc(inputstring))
+        inputstring = raw_input("Paste Logs: ")
