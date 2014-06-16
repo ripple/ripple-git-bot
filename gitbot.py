@@ -193,6 +193,7 @@ def main(params):
 
     printdebug(params, "Connecting to GitHub as bot...")
     client = github.Github(params["token"])                     # Logs into the bot's account
+    params["token"] = "*"*len(params["token"])                  # Obliterates the token after use
 
     printdebug(params, "Connecting to organization "+params["orgname"]+"...")
     org = client.get_organization(params["orgname"])            # Accesses ripple's github organization
