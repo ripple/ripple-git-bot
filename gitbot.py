@@ -177,6 +177,15 @@ def repoparams(params, name, search="repoparams"):
         newparams.update(params["repoparams"][name])            # repoparams should be of the format { reponame : { newparam : value } }
     return newparams
 
+def repomembers(params, repo):
+    """Adds Repository Collaborators To The Members."""
+    parmas["members"] = params["members"][:]
+    for user in repo.get_collaborators():
+        name = formatting(user.login)
+        if not name in params["members"]:
+            params["members"].append(name)
+    return params
+
 def pullparams(params, title):
     """Sets Pull-Request-Title-Specific Parameters."""
     if title.startswith("["):
@@ -221,7 +230,7 @@ def main(params):
     openpulls = {}
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
         name = formatting(repo.name)
-        newparams = repoparams(params, name)
+        newparams = repomembers(repoparams(params, name), repo)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
             printdebug(newparams, "    Scanning repository "+name+"...")
             hookbot(repo, newparams)                            # Makes sure the bot is hooked into the repo
@@ -242,7 +251,7 @@ def main(params):
     merges = []
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
         name = formatting(repo.name)
-        newparams = repoparams(params, name)
+        newparams = repomembers(repoparams(params, name), repo)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
             printdebug(newparams, "    Entering repository "+name+"...")
             for pull in openpulls[repo]:
