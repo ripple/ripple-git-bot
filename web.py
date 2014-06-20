@@ -32,9 +32,9 @@ def run():
     else:
         working = True
         try:
-            memberlist, openpulls, merges = main(newparams)                                                                    # Runs the script and extracts the parameters
+            openpulls, merges = main(newparams)                                                                 # Runs the script and extracts the parameters
         finally:
             working = False
-        printdebug(newparams, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))  # Displays a message with the output parameters
-        return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."                  # Returns a summary string for website visitors
+        printdebug(newparams, "Pull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))                      # Displays a message with the output parameters
+        return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."          # Returns a summary string for website visitors
     return "Failed to boot up pull request analyzer. Check logs for more information."

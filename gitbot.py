@@ -187,6 +187,7 @@ def repomembers(params, repo):
     for user in repo.get_collaborators():
         name = formatting(user.login)
         if not name in params["members"]:
+            printdebug(params, "        Found collaborator "+name+".")
             params["members"].append(name)
     return params
 
@@ -287,4 +288,4 @@ def main(params):
     # Cleaning Up:
 
     printdebug(params, "Finished.")
-    return memberlist, openpulls, merges
+    return openpulls, merges
