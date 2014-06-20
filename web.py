@@ -18,21 +18,22 @@ app = Flask(__name__)           # Creates the application
 
 @app.route("/", methods=['GET', 'POST'])                                    # Registers the script to run on hook or visit
 def run():
-    global working
     printdebug(params, "Initializing...")
-    printdebug(params, "Using parameters: "+repr(params))
+    newparams = params.deepcopy()
+    printdebug(newparams, "Using parameters: "+repr(newparams))
+    global working
     if working:                                                             # Prevents two scripts running at the same time
-        printdebug(params, "    Failed due to concurrent boot.")
-    elif not (params["orgname"] and params["cibotnames"] and params["message"] and params["votecount"] and params["debug"]):
-        printdebug(params, "    Failed due to abscence of requisite config variables. Check your config.py for errors.")
-    elif not params["token"]:
-        printdebug(params, "    Failed due to abscence of login token. Set the BOT_TOKEN environment variable to the bot's login token.")
+        printdebug(newparams, "    Failed due to concurrent boot.")
+    elif not (newparams["orgname"] and newparams["cibotnames"] and newparams["message"] and newparams["votecount"] and newparams["debug"]):
+        printdebug(newparams, "    Failed due to abscence of requisite config variables. Check your config.py for errors.")
+    elif not newparams["token"]:
+        printdebug(newparams, "    Failed due to abscence of login token. Set the BOT_TOKEN environment variable to the bot's login token.")
     else:
         working = True
         try:
-            memberlist, openpulls, merges = main(params)                                                                    # Runs the script and extracts the parameters
+            memberlist, openpulls, merges = main(newparams)                                                                    # Runs the script and extracts the parameters
         finally:
             working = False
-        printdebug(params, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))  # Displays a message with the output parameters
+        printdebug(newparams, "Members: "+repr(memberlist)+"\nPull Requests: "+repr(openpulls)+"\nMerges: "+repr(merges))  # Displays a message with the output parameters
         return "GitHub pull requests succesfully analyzed. Merged "+str(len(merges))+" pull requests."                  # Returns a summary string for website visitors
     return "Failed to boot up pull request analyzer. Check logs for more information."
