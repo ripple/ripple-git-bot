@@ -179,7 +179,7 @@ def repoparams(params, name, search="repoparams"):
 
 def repomembers(params, repo):
     """Adds Repository Collaborators To The Members."""
-    parmas["members"] = params["members"][:]
+    params["members"] = params["members"][:]
     for user in repo.get_collaborators():
         name = formatting(user.login)
         if not name in params["members"]:
