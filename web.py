@@ -5,6 +5,7 @@
 from __future__ import print_function
 from config import os, params
 from flask import Flask
+from copy import deepcopy
 from gitbot import main, printdebug
 
 # Setting Up:
@@ -19,8 +20,8 @@ app = Flask(__name__)           # Creates the application
 @app.route("/", methods=['GET', 'POST'])                                    # Registers the script to run on hook or visit
 def run():
     printdebug(params, "Initializing...")
-    newparams = params.deepcopy()
-    printdebug(newparams, "Using parameters: "+repr(newparams))
+    newparams = deepcopy(params)
+    printdebug(params, "Using parameters: "+repr(newparams))
     global working
     if working:                                                             # Prevents two scripts running at the same time
         printdebug(newparams, "    Failed due to concurrent boot.")
