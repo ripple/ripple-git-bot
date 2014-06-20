@@ -236,7 +236,7 @@ def main(params):
     openpulls = {}
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
         name = formatting(repo.name)
-        printdebug(newparams, "    Scanning repository "+name+"...")
+        printdebug(params, "    Scanning repository "+name+"...")
         newparams = repoparams(params, name)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
             printdebug(newparams, "    Entering repository "+name+"...")
@@ -258,7 +258,7 @@ def main(params):
     merges = []
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
         name = formatting(repo.name)
-        printdebug(newparams, "    Scanning repository "+name+"...")
+        printdebug(params, "    Scanning repository "+name+"...")
         newparams = repomembers(repoparams(params, name), repo)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
             printdebug(newparams, "    Entering repository "+name+"...")
