@@ -49,19 +49,19 @@ def status(pull, params):
         printdebug(params, "            Status is failure.")
         return False
 
-def check(commentlist, memberlist, params):
+def check(commentlist, params):
     """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
     printdebug(params, "            Checking comments...")
     votes = {}
     recvotes = {}
-    if params["creator"] in memberlist:
+    if params["creator"] in params["members"]:
         votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
         printdebug(params, "                Got LGTM vote from creator "+params["creator"]+".")
-    if params["author"] in memberlist:
+    if params["author"] in params["members"]:
         recvotes[params["author"]] = 1
         printdebug(params, "                Got recent LGTM vote from author "+params["author"]+".")
     for user, comment, date in commentlist:
-        if user in memberlist:
+        if user in params["members"]:
             voted = True
             if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
                 votes[user] = 1
@@ -236,9 +236,10 @@ def main(params):
     openpulls = {}
     for repo in org.get_repos():                                # Loops through each repo in ripple's github
         name = formatting(repo.name)
-        newparams = repomembers(repoparams(params, name), repo)
+        printdebug(newparams, "    Scanning repository "+name+"...")
+        newparams = repoparams(params, name)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
-            printdebug(newparams, "    Scanning repository "+name+"...")
+            printdebug(newparams, "    Entering repository "+name+"...")
             hookbot(repo, newparams)                            # Makes sure the bot is hooked into the repo
             openpulls[repo] = []
             for pull in repo.get_pulls():                       # Loops through each pull request in each repo
@@ -257,6 +258,7 @@ def main(params):
     merges = []
     for repo in openpulls:                                      # Loops through each layer of the previously constructed dict
         name = formatting(repo.name)
+        printdebug(newparams, "    Scanning repository "+name+"...")
         newparams = repomembers(repoparams(params, name), repo)
         if newparams["enabled"]:                                # Checks whether or not the bot is enabled for this repo
             printdebug(newparams, "    Entering repository "+name+"...")
@@ -274,7 +276,7 @@ def main(params):
                         "status" : result,
                         "comments" : []
                         })
-                    message = check(commentlist(pull), memberlist, newparams)       # Calls the check middleware function
+                    message = check(commentlist(pull), newparams)       # Calls the check middleware function
                     if message:                                 # If the middleware function gives the okay,
                         merges.append((pull, message))
                         printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
