@@ -66,6 +66,7 @@ params = {
             "enabled" : True
             }
         },
+    "orgvote" : False,                                              # Whether or not the votes of all organization members should count
     "enabled" : False,                                              # Whether or not the bot is enabled
     "merge" : False,                                                # Whether or not the bot should actually merge, or just comment
     "debug" : True                                                  # Turns on and off verbose debug output

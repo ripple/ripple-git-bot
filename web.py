@@ -25,8 +25,8 @@ def run():
     global working
     if working:                                                             # Prevents two scripts running at the same time
         printdebug(newparams, "    Failed due to concurrent boot.")
-    elif not (newparams["orgname"] and newparams["cibotnames"] and newparams["message"] and newparams["votecount"] and newparams["debug"]):
-        printdebug(newparams, "    Failed due to abscence of requisite config variables. Check your config.py for errors.")
+    elif not newparams["orgname"]:
+        printdebug(newparams, "    Failed due to abscence of organization name. Set the BOT_ORGNAME environment variable to the name of the organization.")
     elif not newparams["token"]:
         printdebug(newparams, "    Failed due to abscence of login token. Set the BOT_TOKEN environment variable to the bot's login token.")
     else:

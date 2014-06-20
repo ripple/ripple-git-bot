@@ -219,12 +219,13 @@ def main(params):
     # Creating The Necessary Objects:
 
     printdebug(params, "Scanning members...")
-    members = org.get_members()                                 # Gets a list of members
     memberlist = []
-    for member in members:
-        name = formatting(member.login)
-        printdebug(params, "    Found member "+name+".")
-        memberlist.append(name)                                 # Makes a list of member names
+    if params["orgvote"]:
+        members = org.get_members()                             # Gets a list of members
+        for member in members:
+            name = formatting(member.login)
+            printdebug(params, "    Found member "+name+".")
+            memberlist.append(name)                             # Makes a list of member names
 
     params.update({                                             # Adds the memberlist to the params
         "members" : memberlist
