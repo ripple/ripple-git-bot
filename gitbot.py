@@ -6,6 +6,11 @@ from __future__ import print_function
 import github
 import string
 
+# Setting Up:
+
+global count
+count = 0
+
 # Middleware Functions:
 
 def status(pull, params):
@@ -143,11 +148,10 @@ def messageproc(params, message):
 def printdebug(params, message):
     """Prints A Message If The Debug Variable Is Set To True."""
     if params["debug"]:
-        if not "count" in params:
-            params["count"] = 0
+        global count
         for line in message.split("\n"):
-            params["count"] += 1
-            print(str(params["count"])+". "+str(line))
+            count += 1
+            print(str(count)+". "+str(line))
 
 def hookbot(repo, params):
     """Makes Sure The Repository Has A Hook In Place To Call The Bot."""
