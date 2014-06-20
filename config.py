@@ -44,6 +44,15 @@ params = {
             },
         "bug" : {
             "recvotes" : 2
+            },
+        "test" : {
+            "recvotes" : 2
+            },
+        "doc" : {
+            "recvotes" : 2
+            },
+        "task" : {
+            "recvotes" : 2
             }
         },
     "repoparams" : {                                                # Specific parameters for each repo
