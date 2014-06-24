@@ -64,6 +64,9 @@ params = {
             },
         "gatewayd" : {
             "enabled" : True
+            },
+        "ripple-rest" : {
+            "enabled" : True
             }
         },
     "orgvote" : False,                                              # Whether or not the votes of all organization members should count
