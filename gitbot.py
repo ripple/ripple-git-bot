@@ -180,9 +180,10 @@ def hookbot(repo, params):
 
 def repoparams(params, name, search="repoparams"):
     """Sets The Repository-Specific Parameters."""
+    search = str(search)
     newparams = dict(params)
-    if name in params["repoparams"]:
-        newparams.update(params["repoparams"][name])            # repoparams should be of the format { reponame : { newparam : value } }
+    if name in params[search]:
+        newparams.update(params[search][name])              # params[search] should be of the format { name : { newparam : value } }
         printdebug(params, "        "+"        "*(search=="tagparams")+"Updated parameters for "+str(name)+" to "+str(params["repoparams"][name])+".")
     elif search == "tagparams":
         printdebug(params, "                Unknown tag ["+name+"].")
