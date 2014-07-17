@@ -16,17 +16,17 @@ count = 0
 def status(pull, params):
     """Checks Whether Or Not pull Has Been Signed Off On By The CI Build Manager."""
     printdebug(params, "            Checking status...")
+    commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
+    params.update({                                                     # Adds the most recent commit to the params
+        "commit" : commit,
+        "date" : commit.commit.author.date,
+        "author" : formatting(commit.author.login)
+        })
+    printdebug(params, "                Found commit.")
     if not params["travis"]:
         printdebug(params, "                Overriding status check.")
         return True
     else:
-        commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
-        params.update({                                                     # Adds the most recent commit to the params
-            "commit" : commit,
-            "date" : commit.commit.author.date,
-            "author" : formatting(commit.author.login)
-            })
-        printdebug(params, "                Found commit.")
         checked = False
         for status in commit.get_statuses():                                # Loops through each status on the commit
             name = formatting(status.creator.login)
