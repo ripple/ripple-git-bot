@@ -184,7 +184,7 @@ def repoparams(params, name, search="repoparams"):
     newparams = dict(params)
     if name in params[search]:
         newparams.update(params[search][name])              # params[search] should be of the format { name : { newparam : value } }
-        printdebug(params, "        "+"        "*(search=="tagparams")+"Updated parameters for "+str(name)+" to "+str(params["repoparams"][name])+".")
+        printdebug(params, "        "+"        "*(search=="tagparams")+"Updated parameters for "+str(name)+" to "+str(params[search][name])+".")
     elif search == "tagparams":
         printdebug(params, "                Unknown tag ["+name+"].")
     return newparams
