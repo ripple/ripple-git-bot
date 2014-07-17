@@ -86,7 +86,9 @@ for param in params:
             params[param] = params[param].lower()
             if params[param] == "false":
                 params[param] = False
+            elif params[param] == "true":
+                params[param] = True
             else:
-                params[param] = bool(params[param])
+                raise ValueError("Invalid bool name "+params[param])
         else:
             params[param] = constr(params[param])                   # Make sure to convert to the proper type
