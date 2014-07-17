@@ -183,7 +183,9 @@ def repoparams(params, name, search="repoparams"):
     newparams = dict(params)
     if name in params["repoparams"]:
         newparams.update(params["repoparams"][name])            # repoparams should be of the format { reponame : { newparam : value } }
-        printdebug(params, "        "+"    "*(search=="tagparams")+"Updated parameters for "+str(name)+" to "+str(params["repoparams"][name]))
+        printdebug(params, "        "+"        "*(search=="tagparams")+"Updated parameters for "+str(name)+" to "+str(params["repoparams"][name])+".")
+    elif search == "tagparams":
+        printdebug(params, "                Unknown tag ["+name+"].")
     return newparams
 
 def repomembers(params, repo):
@@ -200,6 +202,7 @@ def pullparams(params, title):
     """Sets Pull-Request-Title-Specific Parameters."""
     if title.startswith("["):
         tag = formatting(title[1:].split("]", 1)[0])            # A tag is of the format [Tag]
+        printdebug(params, "            Checking tagparams for tag ["+tag+"]...")
         return repoparams(params, tag, search="tagparams")      # Uses repoparams for the actual checking, but with the tagparams variable
     else:
         return dict(params)
