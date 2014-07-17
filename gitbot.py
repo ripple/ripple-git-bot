@@ -16,38 +16,42 @@ count = 0
 def status(pull, params):
     """Checks Whether Or Not pull Has Been Signed Off On By The CI Build Manager."""
     printdebug(params, "            Checking status...")
-    commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
-    params.update({                                                     # Adds the most recent commit to the params
-        "commit" : commit,
-        "date" : commit.commit.author.date,
-        "author" : formatting(commit.author.login)
-        })
-    printdebug(params, "            Found commit.")
-    checked = False
-    for status in commit.get_statuses():                                # Loops through each status on the commit
-        name = formatting(status.creator.login)
-        printdebug(params, "                Found status from bot "+name+".")
-        if name in params["cibotnames"]:                                # Checks if the status was made by the CI bot
-            state = formatting(status.state)
-            if state == "success":                                      # Checks if the status from the most recent comment by the CI bot is success
-                checked = True
-                printdebug(params, "                    CI bot reports commit passed tests.")
-                break
-            elif state == "pending":
-                printdebug(params, "                    CI bot reports commit tests in progress.")
-                return False                                            # Pending doesn't mean success
-            else:
-                printdebug(params, "                    CI bot reports commit failed tests.")
-                return False                                            # We only care about the most recent status from the CI bot, so if that isn't success, then end
-    if not checked:
-        printdebug(params, "                CI bot not reporting for this commit.")
-        return False
-    if checked:
-        printdebug(params, "            Status is success.")
+    if not params["travis"]:
+        printdebug(params, "                Overriding status check.")
         return True
     else:
-        printdebug(params, "            Status is failure.")
-        return False
+        commit = listify(pull.get_commits())[-1]                            # Only the last commit will have CI build statuses on it
+        params.update({                                                     # Adds the most recent commit to the params
+            "commit" : commit,
+            "date" : commit.commit.author.date,
+            "author" : formatting(commit.author.login)
+            })
+        printdebug(params, "                Found commit.")
+        checked = False
+        for status in commit.get_statuses():                                # Loops through each status on the commit
+            name = formatting(status.creator.login)
+            printdebug(params, "                    Found status from bot "+name+".")
+            if name in params["cibotnames"]:                                # Checks if the status was made by the CI bot
+                state = formatting(status.state)
+                if state == "success":                                      # Checks if the status from the most recent comment by the CI bot is success
+                    checked = True
+                    printdebug(params, "                        CI bot reports commit passed tests.")
+                    break
+                elif state == "pending":
+                    printdebug(params, "                        CI bot reports commit tests in progress.")
+                    return False                                            # Pending doesn't mean success
+                else:
+                    printdebug(params, "                        CI bot reports commit failed tests.")
+                    return False                                            # We only care about the most recent status from the CI bot, so if that isn't success, then end
+        if not checked:
+            printdebug(params, "                    CI bot not reporting for this commit.")
+            return False
+        if checked:
+            printdebug(params, "                Status is success.")
+            return True
+        else:
+            printdebug(params, "                Status is failure.")
+            return False
 
 def check(commentlist, params):
     """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
@@ -80,12 +84,12 @@ def check(commentlist, params):
                     recvotes[user] = votes[user]
                     printdebug(params, "                    Vote qualifies as recent.")
     if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
-        printdebug(params, "            Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
+        printdebug(params, "                Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
         params["voters"] = ", ".join(votes.keys())
         params["recvoters"] = ", ".join(recvotes.keys())
         return messageproc(params, params["message"])
     else:
-        printdebug(params, "            Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
+        printdebug(params, "                Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
         return False
 
 # Utility Functions:

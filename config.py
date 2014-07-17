@@ -69,6 +69,7 @@ params = {
             "enabled" : True
             }
         },
+    "travis" : True,                                                # Whether or not to check Travis for build status
     "orgvote" : False,                                              # Whether or not the votes of all organization members should count
     "enabled" : False,                                              # Whether or not the bot is enabled
     "merge" : False,                                                # Whether or not the bot should actually merge, or just comment
