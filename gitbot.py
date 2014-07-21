@@ -85,8 +85,8 @@ def check(commentlist, params):
                     printdebug(params, "                    Vote qualifies as recent.")
     if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
         printdebug(params, "                Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
-        params["voters"] = ", ".join(votes.keys())
-        params["recvoters"] = ", ".join(recvotes.keys())
+        params["voters"] = ", ".join(sorted(votes.keys()))
+        params["recvoters"] = ", ".join(sorted(recvotes.keys()))
         return messageproc(params, params["message"])
     else:
         printdebug(params, "                Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
