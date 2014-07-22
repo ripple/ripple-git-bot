@@ -274,10 +274,10 @@ def main(params):
             for pull in openpulls[repo]:
                 printdebug(newparams, "        Found pull request.")
                 newparams.update({                              # Adds parameters for use by status
-                        "creator" : formatting(pull.user.login),
-                        "repo" : repo,
-                        "pull" : pull
-                        })
+                    "creator" : formatting(pull.user.login),
+                    "repo" : repo,
+                    "pull" : pull
+                    })
                 specparams = pullparams(newparams, formatting(pull.title))
                 result = status(pull, specparams)               # Calls the status middleware function
                 if result:                                      # If the status middleware function gives the okay, proceed

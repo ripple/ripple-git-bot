@@ -53,6 +53,9 @@ params = {
             },
         "task" : {
             "recvotes" : 2
+            },
+        "chore" : {
+            "recvotes" : 2
             }
         },
     "repoparams" : {                                                # Specific parameters for each repo
