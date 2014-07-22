@@ -278,23 +278,23 @@ def main(params):
                         "repo" : repo,
                         "pull" : pull
                         })
-                newparams = pullparams(newparams, formatting(pull.title))
-                result = status(pull, newparams)                # Calls the status middleware function
+                specparams = pullparams(newparams, formatting(pull.title))
+                result = status(pull, specparams)               # Calls the status middleware function
                 if result:                                      # If the status middleware function gives the okay, proceed
-                    newparams.update({                          # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
+                    specparams.update({                         # Creates a dictionary of possibly relevant parameters to pass to the check middleware function
                         "status" : result,
                         "comments" : []
                         })
-                    message = check(commentlist(pull), newparams)       # Calls the check middleware function
+                    message = check(commentlist(pull), specparams)      # Calls the check middleware function
                     if message:                                 # If the middleware function gives the okay,
                         merges.append((pull, message))
-                        printdebug(newparams, "        Merging pull request with comment '"+message+"'...")
-                        if not formatting(message) in newparams["comments"]:
+                        printdebug(specparams, "        Merging pull request with comment '"+message+"'...")
+                        if not formatting(message) in specparams["comments"]:
                             pull.create_issue_comment(message)  # Create a comment with the middleware function's result
-                            printdebug(newparams, "            Pull request commented on.")
-                        if newparams["merge"]:
+                            printdebug(specparams, "            Pull request commented on.")
+                        if specparams["merge"]:
                             pull.merge(message)                 # Merge using the middleware function's result as the description
-                            printdebug(newparams, "            Pull request merged.")
+                            printdebug(specparams, "            Pull request merged.")
 
     # Cleaning Up:
 
