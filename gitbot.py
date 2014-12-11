@@ -5,6 +5,13 @@
 from __future__ import print_function
 import github
 import string
+import subprocess
+from urlparse import urlparse
+import sys
+import traceback
+import requests
+import os
+import shutil
 
 # Setting Up:
 
@@ -91,6 +98,35 @@ def check(commentlist, params):
     else:
         printdebug(params, "                Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
         return False
+
+def autorebase(pullpath, ripple_url):
+    error = False
+    res = requests.get(pullpath)                                                         # Call github API to get raw JSON
+    jsondata = res.json()
+    url = jsondata["head"]["repo"]["clone_url"]
+    branch = jsondata["head"]["ref"]
+    path = urlparse(url).path.split("/")
+    len = len(path)
+    dir = path[len-1].split(".")[0]                                                      # remove trailing ".git" from directory
+    os.chdir(os.environ["HOME"])                                                         # do this to be sure to clone from home directory
+    try:
+        subprocess.check_call(["git", "clone", url])
+        os.chdir(dir)
+        subprocess.check_call(["git", "checkout", "-b", branch])
+        subprocess.check_call(["git", "remote", "add", "ripple", ripple_url])
+        subprocess.check_call(["git", "fetch", "ripple"])
+        subprocess.check_call(["git", "config", "--global", "push.default", "simple"])
+        subprocess.check_call(["git", "rebase", "ripple/master"])                        # try to rebase and push to create a new pull request
+        subprocess.check_call(["git", "push", "-f"])
+    except subprocess.CalledProcessError:
+        error = True
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        message = ''.join('- ' + line for line in lines)
+        printdebug(specparams, message)
+    os.chdir(os.environ["HOME"])                                                         # change back to home directory for clean up
+    shutil.rmtree(dir)
+    return error
 
 # Utility Functions:
 
@@ -293,8 +329,18 @@ def main(params):
                             pull.create_issue_comment(message)  # Create a comment with the middleware function's result
                             printdebug(specparams, "            Pull request commented on.")
                         if specparams["merge"]:
-                            pull.merge(message)                 # Merge using the middleware function's result as the description
-                            printdebug(specparams, "            Pull request merged.")
+                            pullnumber = pull.number
+                            pullpath = "https://api.github.com/repos/ripple/" + repo.name + "/pulls/" + str(pullnumber)
+                            error = autorebase(pullpath, repo.clone_url)        # try to rebase the branch before merging the pull request
+                            if error == False:                  # no error rebasing the branch
+                                if not pull.is_merged() and pull.mergeable:                # safety check
+                                    pull.merge(message)                 # Merge using the middleware function's result as the description
+                                    printdebug(specparams, "            Pull request " + pullpath + " merged.")
+                                else:
+                                    printdebug(specparams, "            Pull request not merged due to conflict." +  pull.user.login + " please check your pull request.")
+                            else:
+                                printdebug(specparams, "            Pull request not merged due to error." +  pull.user.login + " please check your pull request.")
+
 
     # Cleaning Up:
 
