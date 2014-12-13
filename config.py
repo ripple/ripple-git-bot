@@ -22,6 +22,7 @@ params = {
     "orgname" : "",                                                 # The name of ripple's github organization
     "cibotnames" : [],                                              # The names of ripple's CI bots
     "hookurl" : "",                                                 # The url of the server file for hooking into
+    "mergestring": "@ripplebot merge",                              # What string tells the bot to merge the pull request
     "votecount" : 2,                                                # The number of LGTM votes required to merge
     "recvotes" : 3,                                                 # How many of those have to be after the most recent commit
     "message" : "Ready to merge: Travis build checks out, most recent commit looks good to <recvoters>.",        # The message displayed by the bot on merge
@@ -74,8 +75,8 @@ params = {
         },
     "travis" : True,                                                # Whether or not to check Travis for build status
     "orgvote" : False,                                              # Whether or not the votes of all organization members should count
-    "enabled" : False,                                              # Whether or not the bot is enabled
-    "merge" : False,                                                # Whether or not the bot should actually merge, or just comment
+    "enabled" : True,                                               # Whether or not the bot is enabled
+    "merge" : True,                                                 # Whether or not the bot should actually merge, or just comment
     "debug" : True                                                  # Turns on and off verbose debug output
     }
 
