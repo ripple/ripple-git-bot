@@ -61,10 +61,12 @@ def status(pull, params):
             return False
 
 def check(commentlist, params):
-    """Checks That At Least votecount Members Have Commented LGTM And None Commented VETO."""
+    """Checks That At Least votecount Members Have Commented LGTM, None Commented VETO, And At Least One Requested the Gitbot Merge the Pull Request."""
     printdebug(params, "            Checking comments...")
     votes = {}
     recvotes = {}
+    botmerge = False
+    mergeforuser = ""
     if params["creator"] in params["members"]:
         votes[params["creator"]] = 1                        # If the creator is a member, give them a vote
         printdebug(params, "                Got LGTM vote from creator "+params["creator"]+".")
@@ -74,6 +76,9 @@ def check(commentlist, params):
     for user, comment, date in commentlist:
         if user in params["members"]:
             voted = True
+            if params["mergestring"] in comment:
+                botmerge = True
+                mergeforuser = user
             if startswithany(comment, params["lgtms"]):     # If a member commented LGTM, give them a vote
                 votes[user] = 1
                 printdebug(params, "                Got LGTM vote from "+user+".")
@@ -90,13 +95,13 @@ def check(commentlist, params):
                 if voted:
                     recvotes[user] = votes[user]
                     printdebug(params, "                    Vote qualifies as recent.")
-    if sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
-        printdebug(params, "                Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, and at least "+str(params["recvotes"])+" recent LGTM votes.")
+    if botmerge and sum(votes.values()) >= params["votecount"] and sum(recvotes.values()) >= params["recvotes"]:
+        printdebug(params, "                Found no VETO votes, at least "+str(params["votecount"])+" LGTM votes, at least "+str(params["recvotes"])+" recent LGTM votes, and user "+mergeforuser+" requested the bot merge this pull request .")
         params["voters"] = ", ".join(sorted(votes.keys()))
         params["recvoters"] = ", ".join(sorted(recvotes.keys()))
         return messageproc(params, params["message"])
     else:
-        printdebug(params, "                Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, or fewer than "+str(params["recvotes"])+" recent LGTM votes.")
+        printdebug(params, "                Found fewer than "+str(params["votecount"])+" LGTM votes, a VETO vote, fewer than "+str(params["recvotes"])+" recent LGTM votes, or no user requesting the bot to merge.")
         return False
 
 def autorebase(pullpath, ripple_url):
